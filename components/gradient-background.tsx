@@ -26,6 +26,7 @@ export function GradientBackground() {
           repeat: Infinity,
           ease: "easeInOut",
         }}
+        style={{ willChange: "transform", transform: "translateZ(0)" }}
         className="absolute top-[15%] right-[25%] w-96 h-96 rounded-full bg-gradient-to-tr from-purple-500/20 to-cyan-400/25 blur-[100px]"
       />
 
@@ -40,6 +41,7 @@ export function GradientBackground() {
           repeat: Infinity,
           ease: "easeInOut",
         }}
+        style={{ willChange: "transform", transform: "translateZ(0)" }}
         className="absolute bottom-[25%] left-[15%] w-80 h-80 rounded-full bg-gradient-to-tr from-blue-600/20 to-pink-500/20 blur-[90px]"
       />
 

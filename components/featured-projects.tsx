@@ -169,6 +169,7 @@ function ProjectCard({ project }: { project: Project }) {
         <div className="relative h-64 sm:h-72 overflow-hidden bg-black flex items-center justify-center">
           <iframe
             src={project.videoUrl}
+            loading="lazy"
             title={language === "es" ? project.titleEs : project.titleEn}
             className="w-full h-full object-cover"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -189,13 +190,18 @@ function ProjectCard({ project }: { project: Project }) {
             src={project.carousel[imgIdx].src}
             alt=""
             aria-hidden="true"
-            className="absolute inset-0 w-full h-full object-cover blur-2xl opacity-40 scale-110 pointer-events-none"
+            loading="lazy"
+            decoding="async"
+            className="absolute inset-0 w-full h-full object-cover blur-xl opacity-30 scale-105 pointer-events-none"
+            style={{ transform: "translateZ(0)" }}
           />
           <AnimatePresence mode="wait">
             <motion.img
               key={imgIdx}
               src={project.carousel[imgIdx].src}
               alt={language === "es" ? project.carousel[imgIdx].captionEs : project.carousel[imgIdx].captionEn}
+              loading="lazy"
+              decoding="async"
               className="relative z-10 w-full h-full object-contain object-center transition-all duration-300"
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}

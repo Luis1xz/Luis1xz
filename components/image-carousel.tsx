@@ -69,12 +69,18 @@ export function ImageCarousel({ images, className = "" }: ImageCarouselProps) {
                 src={images[currentIndex].src || "/placeholder.svg"}
                 alt=""
                 aria-hidden="true"
-                className="absolute inset-0 w-full h-full object-cover blur-2xl opacity-40 scale-110 pointer-events-none"
+                loading="lazy"
+                decoding="async"
+                className="absolute inset-0 w-full h-full object-cover blur-xl opacity-30 scale-105 pointer-events-none"
+                style={{ transform: "translateZ(0)" }}
               />
               <img
                 src={images[currentIndex].src || "/placeholder.svg"}
                 alt={images[currentIndex].alt}
+                loading="lazy"
+                decoding="async"
                 className="relative z-10 max-h-full max-w-full object-contain mx-auto"
+                style={{ transform: "translateZ(0)" }}
               />
             </div>
             <div className="absolute inset-0 pointer-events-none bg-gradient-to-t from-black/60 via-transparent to-transparent" />

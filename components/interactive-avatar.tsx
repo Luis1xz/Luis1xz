@@ -15,6 +15,14 @@ interface InteractiveAvatarProps {
 
 const REACTION_STATES: AvatarState[] = ["greeting", "thumbs", "glass", "salchipapa"]
 
+const CLIP_MAP: Record<AvatarState, string> = {
+  idle: "/avatar/clip1.mp4",
+  greeting: "/avatar/clip2.mp4",
+  thumbs: "/avatar/clip3.mp4",
+  glass: "/avatar/clip5.mp4",
+  salchipapa: "/avatar/clip6.mp4",
+}
+
 export function InteractiveAvatar({ className = "", mouseX, mouseY }: InteractiveAvatarProps) {
   const { t } = useLanguage()
   const [activeState, setActiveState] = useState<AvatarState>("idle")
@@ -22,12 +30,9 @@ export function InteractiveAvatar({ className = "", mouseX, mouseY }: Interactiv
   const [isLoading, setIsLoading] = useState(true)
   const [isTouch, setIsTouch] = useState(false)
 
-  // Refs for all 5 individual video instances
-  const idleVideoRef = useRef<HTMLVideoElement | null>(null)       // clip1: Respiración continua
-  const greetingVideoRef = useRef<HTMLVideoElement | null>(null)   // clip2: Saludo
-  const thumbsVideoRef = useRef<HTMLVideoElement | null>(null)     // clip3: Thumbs up / Guiño
-  const glassVideoRef = useRef<HTMLVideoElement | null>(null)      // clip5: Vidrio roto
-  const salchipapaVideoRef = useRef<HTMLVideoElement | null>(null) // clip6: Salchipapa
+  // Maximum 2 video elements in DOM to strictly prevent iOS Safari AVPlayer & VRAM exhaustion crashes
+  const idleVideoRef = useRef<HTMLVideoElement | null>(null)       // Video 1: Breathing loop
+  const reactionVideoRef = useRef<HTMLVideoElement | null>(null)   // Video 2: Active reaction clip
 
   const reactionIndexRef = useRef<number>(-1)
   const lastInteractionTimeRef = useRef<number>(0)
@@ -116,72 +121,50 @@ export function InteractiveAvatar({ className = "", mouseX, mouseY }: Interactiv
     }
   }, [configureVideoDOM, handleIdleReady])
 
-  // Safely pause and reset all reaction clips (except the currently playing one)
-  const stopOtherReactions = useCallback((exceptVideo?: HTMLVideoElement | null) => {
-    const reactionRefs = [greetingVideoRef, thumbsVideoRef, glassVideoRef, salchipapaVideoRef]
-    reactionRefs.forEach((ref) => {
-      const vid = ref.current
-      if (vid && vid !== exceptVideo) {
-        vid.pause()
-        vid.currentTime = 0
-      }
-    })
-  }, [])
-
   // Return to breathing idle loop gracefully
   const returnToIdle = useCallback(() => {
     activeStateRef.current = "idle"
     setActiveState("idle")
-    stopOtherReactions(null)
+
+    const reactionVideo = reactionVideoRef.current
+    if (reactionVideo) {
+      reactionVideo.pause()
+    }
 
     const idleVideo = idleVideoRef.current
     if (idleVideo) {
       configureVideoDOM(idleVideo)
       idleVideo.play().catch(() => {})
     }
-  }, [stopOtherReactions, configureVideoDOM])
+  }, [configureVideoDOM])
 
   // Play a specific reaction video from the beginning
   const playReaction = useCallback((nextState: AvatarState) => {
     activeStateRef.current = nextState
     setActiveState(nextState)
 
-    const videoMap: Record<AvatarState, HTMLVideoElement | null> = {
-      greeting: greetingVideoRef.current,
-      thumbs: thumbsVideoRef.current,
-      glass: glassVideoRef.current,
-      salchipapa: salchipapaVideoRef.current,
-      idle: idleVideoRef.current,
-    }
+    const reactionVideo = reactionVideoRef.current
+    if (reactionVideo) {
+      configureVideoDOM(reactionVideo)
+      const targetSrc = CLIP_MAP[nextState]
+      
+      // Update src only if changed to avoid unnecessary re-decoding
+      if (!reactionVideo.src.endsWith(targetSrc)) {
+        reactionVideo.src = targetSrc
+      }
 
-    const targetVideo = videoMap[nextState]
-
-    // Stop and reset all OTHER reaction videos so they don't consume hardware decoders or trigger ghost onEnded
-    stopOtherReactions(targetVideo)
-
-    if (targetVideo) {
-      configureVideoDOM(targetVideo)
-      targetVideo.currentTime = 0
-      const playPromise = targetVideo.play()
+      reactionVideo.currentTime = 0
+      const playPromise = reactionVideo.play()
       if (playPromise !== undefined) {
         playPromise.catch((err) => {
-          console.warn("Avatar video play failed:", err)
+          console.warn("Avatar reaction play failed:", err)
           if (activeStateRef.current === nextState) {
             returnToIdle()
           }
         })
       }
     }
-  }, [stopOtherReactions, configureVideoDOM, returnToIdle])
-
-  // Handlers when each reaction video finishes naturally
-  const handleVideoEnded = useCallback((finishedState: AvatarState) => {
-    // CRITICAL: Only return to idle if THIS video is still the active one!
-    // If user already tapped another reaction, do NOT cut off the new video!
-    if (activeStateRef.current === finishedState) {
-      returnToIdle()
-    }
-  }, [returnToIdle])
+  }, [configureVideoDOM, returnToIdle])
 
   // Advance animation on Click or Tap (iPad, iPhone, Android, PC)
   const handleInteraction = useCallback((e?: React.SyntheticEvent) => {
@@ -329,7 +312,7 @@ export function InteractiveAvatar({ className = "", mouseX, mouseY }: Interactiv
           )}
         </AnimatePresence>
 
-        {/* 1. ESTADO: IDLE / RESPIRACIÓN (Loop continuo por defecto en segundo plano) */}
+        {/* 1. VIDEO BASE: RESPIRACIÓN CONTINUA (clip1) */}
         <video
           ref={idleVideoRef}
           src="/avatar/clip1.mp4"
@@ -346,59 +329,16 @@ export function InteractiveAvatar({ className = "", mouseX, mouseY }: Interactiv
           }`}
         />
 
-        {/* 2. ESTADO: SALUDO (clip2) - Preload metadata to prevent iOS VRAM crash */}
+        {/* 2. VIDEO DE REACCIÓN ACTIVA (Un solo elemento dinámico para evitar sobrecarga de hardware en iOS) */}
         <video
-          ref={greetingVideoRef}
-          src="/avatar/clip2.mp4"
+          ref={reactionVideoRef}
           muted
           playsInline
           controls={false}
-          preload="metadata"
-          onEnded={() => handleVideoEnded("greeting")}
+          preload="none"
+          onEnded={returnToIdle}
           className={`absolute inset-0 w-full h-full object-cover object-top pointer-events-none transition-opacity duration-300 ease-in-out ${
-            activeState === "greeting" ? "opacity-100 z-20" : "opacity-0 z-0"
-          }`}
-        />
-
-        {/* 3. ESTADO: THUMBS UP / REACCIÓN (clip3) - Preload metadata */}
-        <video
-          ref={thumbsVideoRef}
-          src="/avatar/clip3.mp4"
-          muted
-          playsInline
-          controls={false}
-          preload="metadata"
-          onEnded={() => handleVideoEnded("thumbs")}
-          className={`absolute inset-0 w-full h-full object-cover object-top pointer-events-none transition-opacity duration-300 ease-in-out ${
-            activeState === "thumbs" ? "opacity-100 z-30" : "opacity-0 z-0"
-          }`}
-        />
-
-        {/* 4. ESTADO: VIDRIO ROTO (clip5) - Preload metadata */}
-        <video
-          ref={glassVideoRef}
-          src="/avatar/clip5.mp4"
-          muted
-          playsInline
-          controls={false}
-          preload="metadata"
-          onEnded={() => handleVideoEnded("glass")}
-          className={`absolute inset-0 w-full h-full object-cover object-top pointer-events-none transition-opacity duration-300 ease-in-out ${
-            activeState === "glass" ? "opacity-100 z-40" : "opacity-0 z-0"
-          }`}
-        />
-
-        {/* 5. ESTADO: SALCHIPAPA (clip6) - Preload metadata */}
-        <video
-          ref={salchipapaVideoRef}
-          src="/avatar/clip6.mp4"
-          muted
-          playsInline
-          controls={false}
-          preload="metadata"
-          onEnded={() => handleVideoEnded("salchipapa")}
-          className={`absolute inset-0 w-full h-full object-cover object-top pointer-events-none transition-opacity duration-300 ease-in-out ${
-            activeState === "salchipapa" ? "opacity-100 z-50" : "opacity-0 z-0"
+            activeState !== "idle" ? "opacity-100 z-20" : "opacity-0 z-0"
           }`}
         />
       </div>

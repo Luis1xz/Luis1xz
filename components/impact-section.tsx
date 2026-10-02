@@ -128,10 +128,13 @@ export function ImpactSection() {
                       <img
                         src="/alcaldia-barranquilla.jpg"
                         alt="Alcaldía de Barranquilla cobertura"
+                        loading="lazy"
+                        decoding="async"
                         className="absolute inset-0 w-full h-full object-cover blur-sm opacity-30 pointer-events-none"
                       />
                       <iframe
                         src="https://www.instagram.com/reel/DQFMRu4DxUz/embed"
+                        loading="lazy"
                         title="Reel Oficial Alcaldía de Barranquilla — Luis Alfonso Herrera"
                         className="relative z-10 w-full h-full object-cover"
                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -215,6 +218,7 @@ export function ImpactSection() {
                     <div className="relative w-full max-w-[320px] aspect-[9/16] rounded-2xl overflow-hidden border-2 border-purple-500/40 shadow-2xl shadow-purple-500/20 bg-black group">
                       <iframe
                         src="https://www.youtube.com/embed/rNxhNOWBpas"
+                        loading="lazy"
                         title="Entrevista Uninorte — Apertura Skill Challenge"
                         className="w-full h-full object-cover"
                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"

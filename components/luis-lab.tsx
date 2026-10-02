@@ -30,7 +30,7 @@ const experiments: Experiment[] = [
     hardware: ["Microcontroller", "IR Sensors", "Motor Driver", "DC Motors"],
     software: ["C++", "PID Algorithm"],
     tech: ["C++", "Microcontrollers", "Sensors", "Robotics"],
-    result: "Competed in Skill Challenge robotics competition. Bronze medal (2023).",
+    result: "Competed in Skill Challenge. Bronze medal (2023).",
   },
   {
     id: "valentine",
@@ -64,15 +64,15 @@ const experiments: Experiment[] = [
     title: "ConductarNorte Platform",
     subtitle: "Satisfaction survey system",
     status: "completed",
-    problem: "Manual data collection for satisfaction surveys and administrative processes — inefficient and hard to analyze.",
-    solution: "Web platform for digital surveys, satisfaction evaluation, PQRS, and administrative panel with multi-level access. Built with Google Apps Script and Google Sheets as backend.",
+    problem: "Manual data collection for satisfaction surveys — inefficient and hard to analyze.",
+    solution: "Web platform for digital surveys, satisfaction evaluation, PQRS, and admin panel with multi-level access. Built with Google Apps Script and Google Sheets.",
     hardware: [],
-    software: ["Google Apps Script", "Google Sheets", "HTML", "CSS", "JS", "QR Codes"],
+    software: ["Google Apps Script", "Google Sheets", "HTML", "CSS", "JS"],
     tech: ["Google Apps Script", "Google Sheets", "Web", "QR Codes"],
     result: "Automated data collection and reporting for administrative processes.",
   },
   {
-    id: "esp32-experiments",
+    id: "esp32",
     icon: <Thermometer className="w-5 h-5" />,
     title: "ESP32 Experiments",
     subtitle: "IoT & microcontroller prototyping",
@@ -98,16 +98,16 @@ const experiments: Experiment[] = [
 ]
 
 const statusConfig = {
-  active: { label: "Active", color: "text-green-400", dot: "bg-green-400" },
-  completed: { label: "Completed", color: "text-blue-400", dot: "bg-blue-400" },
-  upcoming: { label: "Upcoming", color: "text-gray-500", dot: "bg-gray-500" },
+  active: { label: "Active", color: "text-green-400", dot: "bg-green-400", border: "border-green-500/30", bg: "bg-green-500/5" },
+  completed: { label: "Completed", color: "text-blue-400", dot: "bg-blue-400", border: "border-blue-500/20", bg: "" },
+  upcoming: { label: "Upcoming", color: "text-purple-400/50", dot: "bg-purple-400/40", border: "border-purple-500/10", bg: "" },
 }
 
 export function LuisLab() {
   const [selected, setSelected] = useState<Experiment | null>(null)
 
   return (
-    <section id="lab" className="py-24 px-6 border-t border-white/[0.04]">
+    <section id="lab" className="py-24 px-6 border-t border-purple-500/10">
       <div className="max-w-7xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -117,8 +117,10 @@ export function LuisLab() {
           className="mb-16"
         >
           <p className="text-xs font-mono text-violet-400 tracking-widest uppercase mb-4">Luis Lab</p>
-          <h2 className="text-3xl md:text-4xl font-bold text-white">Personal experiments</h2>
-          <p className="text-gray-500 mt-3 max-w-xl">
+          <h2 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-violet-400 to-cyan-400 bg-clip-text text-transparent">
+            Personal experiments
+          </h2>
+          <p className="text-purple-300/60 mt-3 max-w-xl">
             A personal laboratory of projects — from competitive robotics to accounting automation.
           </p>
         </motion.div>
@@ -135,28 +137,24 @@ export function LuisLab() {
                 viewport={{ once: true }}
                 whileHover={{ y: -4 }}
                 onClick={() => setSelected(exp)}
-                className="text-left p-5 rounded-xl border border-white/[0.06] bg-white/[0.01] hover:border-white/[0.15] hover:bg-white/[0.03] transition-all duration-300 group"
+                className={`text-left p-5 rounded-xl border ${status.border} ${status.bg} bg-gray-900/50 hover:border-purple-400/50 hover:shadow-lg hover:shadow-purple-500/15 transition-all duration-300 group`}
               >
                 <div className="flex items-start justify-between mb-4">
-                  <div className="p-2 rounded-lg bg-white/[0.04] text-gray-400 group-hover:text-white transition-colors">
+                  <div className="p-2 rounded-lg bg-purple-500/10 text-purple-400 group-hover:text-white group-hover:bg-purple-500/20 transition-all">
                     {exp.icon}
                   </div>
                   <div className="flex items-center gap-1.5">
-                    <span className={`w-1.5 h-1.5 rounded-full ${status.dot} ${exp.status === 'active' ? 'animate-pulse' : ''}`} />
+                    <span className={`w-1.5 h-1.5 rounded-full ${status.dot} ${exp.status === "active" ? "animate-pulse" : ""}`} />
                     <span className={`text-xs font-mono ${status.color}`}>{status.label}</span>
                   </div>
                 </div>
-                <h3 className="font-semibold text-white text-sm mb-1">{exp.title}</h3>
-                <p className="text-xs text-gray-600 mb-3">{exp.subtitle}</p>
+                <h3 className="font-semibold text-white text-sm mb-1 group-hover:text-purple-200 transition-colors">{exp.title}</h3>
+                <p className="text-xs text-purple-300/40 mb-3">{exp.subtitle}</p>
                 <div className="flex flex-wrap gap-1">
                   {exp.tech.slice(0, 3).map((t) => (
-                    <span key={t} className="text-xs px-1.5 py-0.5 rounded bg-white/[0.04] text-gray-600 border border-white/[0.04]">
-                      {t}
-                    </span>
+                    <span key={t} className="text-xs px-1.5 py-0.5 rounded bg-purple-500/10 text-purple-400/60 border border-purple-400/15">{t}</span>
                   ))}
-                  {exp.tech.length > 3 && (
-                    <span className="text-xs text-gray-700">+{exp.tech.length - 3}</span>
-                  )}
+                  {exp.tech.length > 3 && <span className="text-xs text-purple-400/30">+{exp.tech.length - 3}</span>}
                 </div>
               </motion.button>
             )
@@ -164,14 +162,13 @@ export function LuisLab() {
         </div>
       </div>
 
-      {/* Modal */}
       <AnimatePresence>
         {selected && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm"
             onClick={() => setSelected(null)}
           >
             <motion.div
@@ -179,43 +176,38 @@ export function LuisLab() {
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
               onClick={(e) => e.stopPropagation()}
-              className="bg-[#0d0d0d] border border-white/[0.1] rounded-2xl p-6 max-w-lg w-full max-h-[80vh] overflow-y-auto"
+              className="bg-gray-900 border border-purple-500/30 rounded-2xl p-6 max-w-lg w-full max-h-[80vh] overflow-y-auto shadow-2xl shadow-purple-500/20"
             >
               <div className="flex items-start justify-between mb-6">
                 <div>
                   <div className="flex items-center gap-2 mb-1">
-                    <span className="text-gray-400">{selected.icon}</span>
+                    <span className="text-purple-400">{selected.icon}</span>
                     <h3 className="text-xl font-bold text-white">{selected.title}</h3>
                   </div>
-                  <p className="text-sm text-gray-500">{selected.subtitle}</p>
+                  <p className="text-sm text-purple-300/50">{selected.subtitle}</p>
                 </div>
-                <button
-                  onClick={() => setSelected(null)}
-                  className="text-gray-600 hover:text-white transition-colors p-1"
-                  aria-label="Close"
-                >
+                <button onClick={() => setSelected(null)} className="text-purple-400/50 hover:text-white transition-colors p-1" aria-label="Close">
                   <X className="w-5 h-5" />
                 </button>
               </div>
-
               <div className="space-y-4">
                 <div>
-                  <p className="text-xs font-mono text-gray-600 uppercase tracking-wider mb-2">Problem</p>
-                  <p className="text-sm text-gray-400 leading-relaxed">{selected.problem}</p>
+                  <p className="text-xs font-mono text-purple-400/50 uppercase tracking-wider mb-2">Problem</p>
+                  <p className="text-sm text-purple-200/70 leading-relaxed">{selected.problem}</p>
                 </div>
                 <div>
-                  <p className="text-xs font-mono text-gray-600 uppercase tracking-wider mb-2">Solution</p>
-                  <p className="text-sm text-gray-400 leading-relaxed">{selected.solution}</p>
+                  <p className="text-xs font-mono text-purple-400/50 uppercase tracking-wider mb-2">Solution</p>
+                  <p className="text-sm text-purple-200/70 leading-relaxed">{selected.solution}</p>
                 </div>
                 {selected.result && (
                   <div>
-                    <p className="text-xs font-mono text-gray-600 uppercase tracking-wider mb-2">Result</p>
-                    <p className="text-sm text-gray-300 font-medium leading-relaxed">{selected.result}</p>
+                    <p className="text-xs font-mono text-purple-400/50 uppercase tracking-wider mb-2">Result</p>
+                    <p className="text-sm text-white font-medium leading-relaxed">{selected.result}</p>
                   </div>
                 )}
                 {selected.hardware && selected.hardware.length > 0 && (
                   <div>
-                    <p className="text-xs font-mono text-gray-600 uppercase tracking-wider mb-2">Hardware</p>
+                    <p className="text-xs font-mono text-purple-400/50 uppercase tracking-wider mb-2">Hardware</p>
                     <div className="flex flex-wrap gap-1.5">
                       {selected.hardware.map((h) => (
                         <span key={h} className="text-xs px-2 py-0.5 rounded bg-orange-500/10 text-orange-400 border border-orange-500/20">{h}</span>
@@ -225,7 +217,7 @@ export function LuisLab() {
                 )}
                 {selected.software && selected.software.length > 0 && (
                   <div>
-                    <p className="text-xs font-mono text-gray-600 uppercase tracking-wider mb-2">Software</p>
+                    <p className="text-xs font-mono text-purple-400/50 uppercase tracking-wider mb-2">Software</p>
                     <div className="flex flex-wrap gap-1.5">
                       {selected.software.map((s) => (
                         <span key={s} className="text-xs px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20">{s}</span>

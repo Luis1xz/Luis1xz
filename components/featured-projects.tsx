@@ -25,7 +25,7 @@ const projects: Project[] = [
   {
     id: "nasa",
     badge: "NASA Space Apps · Local Winner",
-    badgeColor: "bg-blue-600/20 text-blue-400 border-blue-600/30",
+    badgeColor: "bg-blue-500/20 text-blue-300 border-blue-500/30",
     icon: <Brain className="w-5 h-5" />,
     title: "Project Valentine",
     subtitle: "Meteorological monitoring & alert system",
@@ -44,11 +44,11 @@ const projects: Project[] = [
   {
     id: "alfy",
     badge: "KSANCHEZ DELIVERY · CTO",
-    badgeColor: "bg-green-600/20 text-green-400 border-green-600/30",
+    badgeColor: "bg-green-500/20 text-green-300 border-green-500/30",
     icon: <Cpu className="w-5 h-5" />,
     title: "ALFY DEV",
     subtitle: "Accounting & operations software",
-    problem: "Financial and operational data at KSANCHEZ DELIVERY (US logistics company) was processed manually, taking approximately 1 week per cycle.",
+    problem: "Financial and operational data at KSANCHEZ DELIVERY was processed manually, taking approximately 1 week per cycle.",
     solution: "Designed and developed ALFY DEV: an automated accounting system managing financial data, calculating profits, losses, and driver salaries from a centralized server.",
     tech: ["Python", "Data Processing", "Financial Analysis", "Server Integration"],
     result: "Replaced a ~1 week manual process with an automated system that delivers results in approximately 2 seconds.",
@@ -57,11 +57,11 @@ const projects: Project[] = [
   {
     id: "sura",
     badge: "Data Challenge Pro SURA 2025 · 3rd National",
-    badgeColor: "bg-orange-600/20 text-orange-400 border-orange-600/30",
+    badgeColor: "bg-orange-500/20 text-orange-300 border-orange-500/30",
     icon: <Trophy className="w-5 h-5" />,
     title: "Health Data Challenge",
     subtitle: "Predictive AI for healthcare data",
-    problem: "Medical and health system data contains complex patterns that are difficult to analyze manually for anticipating key service behaviors.",
+    problem: "Medical and health system data contains complex patterns difficult to analyze for anticipating key service behaviors.",
     solution: "Built a predictive AI solution using real medical data from SURA. Team: Luis Alfonso Herrera, Henry Sáenz, Francesca Martínez.",
     tech: ["Python", "Machine Learning", "Data Analysis", "Healthcare Data", "Google Colab"],
     result: "3rd place national — Data Challenge Pro SURA 2025.",
@@ -81,15 +81,14 @@ function ProjectCard({ project }: { project: Project }) {
   return (
     <motion.div
       layout
-      className={`border rounded-xl overflow-hidden transition-all duration-300 ${
+      className={`border rounded-xl overflow-hidden transition-all duration-300 hover:shadow-xl ${
         project.highlight
-          ? "border-white/[0.1] bg-white/[0.02]"
-          : "border-white/[0.06] bg-white/[0.01]"
+          ? "border-purple-500/40 bg-gray-900/60 hover:shadow-purple-500/20"
+          : "border-purple-500/20 bg-gray-900/40 hover:shadow-purple-500/10"
       }`}
     >
-      {/* Carousel */}
       {project.carousel && (
-        <div className="relative aspect-video overflow-hidden bg-gray-900/50">
+        <div className="relative aspect-video overflow-hidden bg-gray-900">
           <AnimatePresence mode="wait">
             <motion.img
               key={imgIdx}
@@ -108,17 +107,14 @@ function ProjectCard({ project }: { project: Project }) {
                 <button
                   key={i}
                   onClick={() => setImgIdx(i)}
-                  className={`w-1.5 h-1.5 rounded-full transition-all ${
-                    i === imgIdx ? "bg-white scale-125" : "bg-white/30"
-                  }`}
+                  className={`w-2 h-2 rounded-full transition-all ${i === imgIdx ? "bg-purple-400 scale-125" : "bg-purple-400/30"}`}
                   aria-label={`Image ${i + 1}`}
                 />
               ))}
             </div>
           )}
-          {/* Badge overlay */}
           <div className="absolute top-3 left-3">
-            <span className={`text-xs font-medium px-2.5 py-1 rounded-full border ${project.badgeColor}`}>
+            <span className={`text-xs font-medium px-2.5 py-1 rounded-full border backdrop-blur-sm ${project.badgeColor}`}>
               {project.badge}
             </span>
           </div>
@@ -126,13 +122,12 @@ function ProjectCard({ project }: { project: Project }) {
       )}
 
       <div className="p-6">
-        {/* Header */}
         <div className="flex items-start justify-between gap-4 mb-4">
           <div className="flex items-center gap-2.5">
-            <div className="text-blue-400">{project.icon}</div>
+            <div className="text-purple-400">{project.icon}</div>
             <div>
               <h3 className="font-semibold text-white text-lg leading-tight">{project.title}</h3>
-              <p className="text-sm text-gray-500">{project.subtitle}</p>
+              <p className="text-sm text-purple-300/60">{project.subtitle}</p>
             </div>
           </div>
           {!project.carousel && (
@@ -142,31 +137,26 @@ function ProjectCard({ project }: { project: Project }) {
           )}
         </div>
 
-        {/* ALFY DEV visual */}
         {project.id === "alfy" && (
-          <div className="mb-4 p-4 rounded-lg bg-black/40 border border-white/[0.06]">
+          <div className="mb-4 p-4 rounded-lg bg-black/40 border border-purple-500/20">
             <div className="flex items-center justify-center gap-6">
               <div className="text-center">
                 <p className="text-2xl font-bold text-red-400">1 week</p>
-                <p className="text-xs text-gray-600">Manual process</p>
+                <p className="text-xs text-purple-300/40">Manual process</p>
               </div>
-              <div className="flex flex-col items-center gap-1">
-                <div className="text-gray-700 text-xl">→</div>
-                <div className="w-px h-6 bg-gradient-to-b from-red-500 to-green-500" />
-              </div>
+              <div className="text-purple-400/50 text-xl">→</div>
               <div className="text-center">
                 <p className="text-2xl font-bold text-green-400">~2 sec</p>
-                <p className="text-xs text-gray-600">Automated</p>
+                <p className="text-xs text-purple-300/40">Automated</p>
               </div>
             </div>
           </div>
         )}
 
-        {/* PROBLEM / SOLUTION */}
         <div className="space-y-3 mb-4">
           <div>
-            <p className="text-xs font-mono text-gray-600 uppercase tracking-wider mb-1">Problem</p>
-            <p className="text-sm text-gray-400 leading-relaxed">{project.problem}</p>
+            <p className="text-xs font-mono text-purple-400/50 uppercase tracking-wider mb-1">Problem</p>
+            <p className="text-sm text-purple-200/70 leading-relaxed">{project.problem}</p>
           </div>
           <AnimatePresence>
             {expanded && (
@@ -178,12 +168,12 @@ function ProjectCard({ project }: { project: Project }) {
               >
                 <div className="pt-2 space-y-3">
                   <div>
-                    <p className="text-xs font-mono text-gray-600 uppercase tracking-wider mb-1">Solution</p>
-                    <p className="text-sm text-gray-400 leading-relaxed">{project.solution}</p>
+                    <p className="text-xs font-mono text-purple-400/50 uppercase tracking-wider mb-1">Solution</p>
+                    <p className="text-sm text-purple-200/70 leading-relaxed">{project.solution}</p>
                   </div>
                   <div>
-                    <p className="text-xs font-mono text-gray-600 uppercase tracking-wider mb-1">Result</p>
-                    <p className="text-sm text-gray-300 leading-relaxed font-medium">{project.result}</p>
+                    <p className="text-xs font-mono text-purple-400/50 uppercase tracking-wider mb-1">Result</p>
+                    <p className="text-sm text-white font-medium leading-relaxed">{project.result}</p>
                   </div>
                 </div>
               </motion.div>
@@ -191,48 +181,32 @@ function ProjectCard({ project }: { project: Project }) {
           </AnimatePresence>
         </div>
 
-        {/* Tech tags */}
         <div className="flex flex-wrap gap-1.5 mb-4">
           {project.tech.map((t) => (
-            <span key={t} className="text-xs px-2 py-0.5 rounded bg-white/[0.04] text-gray-500 border border-white/[0.06]">
-              {t}
-            </span>
+            <span key={t} className="text-xs px-2 py-0.5 rounded bg-purple-500/10 text-purple-300 border border-purple-400/20">{t}</span>
           ))}
         </div>
 
-        {/* Actions */}
         <div className="flex items-center justify-between">
           <div className="flex gap-2">
             {project.github && (
-              <a
-                href={project.github}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-1.5 text-xs text-gray-500 hover:text-white transition-colors px-3 py-1.5 rounded border border-white/[0.08] hover:border-white/[0.2]"
-              >
+              <a href={project.github} target="_blank" rel="noopener noreferrer"
+                className="flex items-center gap-1.5 text-xs text-purple-400/60 hover:text-purple-300 transition-colors px-3 py-1.5 rounded border border-purple-500/20 hover:border-purple-400/40">
                 <Github className="w-3 h-3" /> Code
               </a>
             )}
             {project.demo && (
-              <a
-                href={project.demo}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-1.5 text-xs text-gray-500 hover:text-white transition-colors px-3 py-1.5 rounded border border-white/[0.08] hover:border-white/[0.2]"
-              >
+              <a href={project.demo} target="_blank" rel="noopener noreferrer"
+                className="flex items-center gap-1.5 text-xs text-purple-400/60 hover:text-purple-300 transition-colors px-3 py-1.5 rounded border border-purple-500/20 hover:border-purple-400/40">
                 <ExternalLink className="w-3 h-3" /> Demo
               </a>
             )}
           </div>
           <button
             onClick={() => setExpanded(!expanded)}
-            className="flex items-center gap-1 text-xs text-gray-600 hover:text-gray-300 transition-colors"
+            className="flex items-center gap-1 text-xs text-purple-400/50 hover:text-purple-300 transition-colors"
           >
-            {expanded ? (
-              <><ChevronUp className="w-3 h-3" /> Less</>
-            ) : (
-              <><ChevronDown className="w-3 h-3" /> Details</>
-            )}
+            {expanded ? <><ChevronUp className="w-3 h-3" /> Less</> : <><ChevronDown className="w-3 h-3" /> Details</>}
           </button>
         </div>
       </div>
@@ -242,7 +216,7 @@ function ProjectCard({ project }: { project: Project }) {
 
 export function FeaturedProjects() {
   return (
-    <section id="work" className="py-24 px-6">
+    <section id="work" className="py-24 px-6 border-t border-purple-500/10">
       <div className="max-w-7xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -251,13 +225,12 @@ export function FeaturedProjects() {
           viewport={{ once: true }}
           className="mb-16"
         >
-          <p className="text-xs font-mono text-blue-400 tracking-widest uppercase mb-4">Featured Projects</p>
-          <h2 className="text-3xl md:text-4xl font-bold text-white">What I&apos;ve built</h2>
-          <p className="text-gray-500 mt-3 max-w-xl">
-            Real problems. Real solutions. Evidence-backed results.
-          </p>
+          <p className="text-xs font-mono text-purple-400 tracking-widest uppercase mb-4">Featured Projects</p>
+          <h2 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
+            What I&apos;ve built
+          </h2>
+          <p className="text-purple-300/60 mt-3 max-w-xl">Real problems. Real solutions. Evidence-backed results.</p>
         </motion.div>
-
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {projects.map((project, i) => (
             <motion.div

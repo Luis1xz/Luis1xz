@@ -1,18 +1,12 @@
-"use client"
-
 export function GradientBackground() {
   return (
-    <div className="fixed inset-0 z-0 overflow-hidden">
-      {/* Base dark */}
-      <div className="absolute inset-0 bg-[#050505]" />
-      {/* Grid */}
-      <div className="absolute inset-0 bg-grid opacity-100" />
-      {/* Radial glow top-left */}
-      <div className="absolute -top-40 -left-40 w-[600px] h-[600px] bg-blue-600/8 rounded-full blur-[120px]" />
-      {/* Radial glow bottom-right */}
-      <div className="absolute -bottom-40 -right-40 w-[500px] h-[500px] bg-violet-600/8 rounded-full blur-[120px]" />
-      {/* Center subtle glow */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[400px] bg-cyan-500/3 rounded-full blur-[150px]" />
+    <div className="fixed inset-0 z-0">
+      <div className="absolute inset-0 bg-gradient-to-br from-purple-950 via-[#0d0d1a] to-indigo-950" />
+      <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-purple-500/8 to-pink-500/10" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-purple-600/15 via-transparent to-transparent" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_right,_var(--tw-gradient-stops))] from-indigo-600/10 via-transparent to-transparent" />
+      {/* Subtle grid */}
+      <div className="absolute inset-0" style={{backgroundImage: 'linear-gradient(rgba(139,92,246,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(139,92,246,0.04) 1px, transparent 1px)', backgroundSize: '60px 60px'}} />
     </div>
   )
 }

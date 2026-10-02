@@ -18,7 +18,7 @@ import { GradientBackground } from "@/components/gradient-background"
 
 export default function Home() {
   return (
-    <main className="relative min-h-screen bg-[#050505]">
+    <main className="relative min-h-screen">
       <GradientBackground />
       <div className="relative z-10">
         <Navbar />

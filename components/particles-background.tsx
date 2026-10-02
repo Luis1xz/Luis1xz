@@ -22,17 +22,23 @@ export function ParticlesBackground() {
     const ctx = canvas.getContext("2d")
     if (!ctx) return
 
+    let animationFrameId: number
     const particles: Particle[] = []
-    const particleCount = 50
+    const isMobile = typeof window !== "undefined" && window.matchMedia("(max-width: 768px)").matches
+    const particleCount = isMobile ? 25 : 50
+
+    // Limit pixel ratio to max 1.5 on mobile devices to prevent GPU saturation and memory crashes
+    const pixelRatio = isMobile ? Math.min(window.devicePixelRatio || 1, 1.5) : Math.min(window.devicePixelRatio || 1, 2)
 
     const resizeCanvas = () => {
-      canvas.width = window.innerWidth
-      canvas.height = window.innerHeight
+      canvas.width = window.innerWidth * pixelRatio
+      canvas.height = window.innerHeight * pixelRatio
+      ctx.scale(pixelRatio, pixelRatio)
     }
 
     const createParticle = (): Particle => ({
-      x: Math.random() * canvas.width,
-      y: Math.random() * canvas.height,
+      x: Math.random() * window.innerWidth,
+      y: Math.random() * window.innerHeight,
       size: Math.random() * 3 + 1,
       speedX: (Math.random() - 0.5) * 0.5,
       speedY: (Math.random() - 0.5) * 0.5,
@@ -52,13 +58,13 @@ export function ParticlesBackground() {
         particle.x += particle.speedX
         particle.y += particle.speedY
 
-        if (particle.x < 0 || particle.x > canvas.width) particle.speedX *= -1
-        if (particle.y < 0 || particle.y > canvas.height) particle.speedY *= -1
+        if (particle.x < 0 || particle.x > window.innerWidth) particle.speedX *= -1
+        if (particle.y < 0 || particle.y > window.innerHeight) particle.speedY *= -1
       })
     }
 
     const drawParticles = () => {
-      ctx.clearRect(0, 0, canvas.width, canvas.height)
+      ctx.clearRect(0, 0, window.innerWidth, window.innerHeight)
 
       particles.forEach((particle) => {
         ctx.beginPath()
@@ -67,11 +73,13 @@ export function ParticlesBackground() {
         ctx.globalAlpha = particle.opacity
         ctx.fill()
 
-        // Add glow effect
-        ctx.shadowBlur = 10
-        ctx.shadowColor = particle.color
-        ctx.fill()
-        ctx.shadowBlur = 0
+        // Only add blur on desktop to prevent mobile WebKit GPU crashes
+        if (!isMobile) {
+          ctx.shadowBlur = 8
+          ctx.shadowColor = particle.color
+          ctx.fill()
+          ctx.shadowBlur = 0
+        }
       })
 
       // Draw connections between nearby particles
@@ -97,20 +105,23 @@ export function ParticlesBackground() {
     const animate = () => {
       updateParticles()
       drawParticles()
-      requestAnimationFrame(animate)
+      animationFrameId = requestAnimationFrame(animate)
     }
 
     resizeCanvas()
     initParticles()
     animate()
 
-    window.addEventListener("resize", () => {
+    const handleResize = () => {
       resizeCanvas()
       initParticles()
-    })
+    }
+
+    window.addEventListener("resize", handleResize, { passive: true })
 
     return () => {
-      window.removeEventListener("resize", resizeCanvas)
+      cancelAnimationFrame(animationFrameId)
+      window.removeEventListener("resize", handleResize)
     }
   }, [])
 

@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useRef, useState } from "react"
+import React, { useRef, useState, useEffect } from "react"
 import { motion, useMotionValue, useSpring, useTransform } from "framer-motion"
 
 interface Tilt3DCardProps {
@@ -26,6 +26,14 @@ export function Tilt3DCard({
   const mouseY = useMotionValue(0.5)
   const glareX = useMotionValue(50)
   const glareY = useMotionValue(50)
+
+  const [isTouch, setIsTouch] = useState(false)
+
+  useEffect(() => {
+    if (typeof window !== "undefined" && window.matchMedia("(pointer: coarse)").matches) {
+      setIsTouch(true)
+    }
+  }, [])
 
   // Smooth springs for high refresh rate physics
   const springX = useSpring(mouseX, { stiffness: 260, damping: 20 })
@@ -64,20 +72,24 @@ export function Tilt3DCard({
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       onClick={onClick}
-      style={{
-        transformStyle: "preserve-3d",
-        perspective: 1000,
-        rotateX,
-        rotateY,
-      }}
-      whileHover={{ scale: 1.02 }}
+      style={
+        isTouch
+          ? { transform: "translateZ(0)" }
+          : {
+              transformStyle: "preserve-3d",
+              perspective: 1000,
+              rotateX,
+              rotateY,
+            }
+      }
+      whileHover={isTouch ? undefined : { scale: 1.02 }}
       transition={{ duration: 0.2 }}
       className={`relative rounded-2xl transition-shadow duration-300 ${
         isHovered ? "shadow-2xl shadow-purple-500/20" : ""
       } ${className}`}
     >
       {/* 3D Dynamic Specular Glare */}
-      {isHovered && (
+      {!isTouch && isHovered && (
         <motion.div
           className="pointer-events-none absolute inset-0 rounded-2xl z-30 transition-opacity duration-300"
           style={{
@@ -87,7 +99,10 @@ export function Tilt3DCard({
       )}
 
       {/* Card Content with 3D Depth */}
-      <div style={{ transform: "translateZ(10px)", transformStyle: "preserve-3d" }} className="w-full h-full">
+      <div
+        style={isTouch ? undefined : { transform: "translateZ(10px)", transformStyle: "preserve-3d" }}
+        className="w-full h-full"
+      >
         {children}
       </div>
     </motion.div>

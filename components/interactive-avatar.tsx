@@ -13,19 +13,22 @@ interface InteractiveAvatarProps {
   mouseY?: any
 }
 
+const REACTION_STATES: AvatarState[] = ["greeting", "thumbs", "glass", "salchipapa"]
+
 export function InteractiveAvatar({ className = "", mouseX, mouseY }: InteractiveAvatarProps) {
   const { t } = useLanguage()
   const [activeState, setActiveState] = useState<AvatarState>("idle")
-  const [statusMessage, setStatusMessage] = useState("Tócame o pasa el cursor")
+  const activeStateRef = useRef<AvatarState>("idle")
 
   // Refs for all 5 individual video instances
-  const idleVideoRef = useRef<HTMLVideoElement | null>(null)       // clip1: Respiración / Idle continuo
+  const idleVideoRef = useRef<HTMLVideoElement | null>(null)       // clip1: Respiración continua
   const greetingVideoRef = useRef<HTMLVideoElement | null>(null)   // clip2: Saludo
   const thumbsVideoRef = useRef<HTMLVideoElement | null>(null)     // clip3: Thumbs up / Guiño
   const glassVideoRef = useRef<HTMLVideoElement | null>(null)      // clip5: Vidrio roto
   const salchipapaVideoRef = useRef<HTMLVideoElement | null>(null) // clip6: Salchipapa
 
-  const animationStepRef = useRef<number>(0)
+  const reactionIndexRef = useRef<number>(-1)
+  const lastInteractionTimeRef = useRef<number>(0)
 
   // 3D Parallax tilt effect
   const defaultMouseX = useMotionValue(0)
@@ -38,24 +41,99 @@ export function InteractiveAvatar({ className = "", mouseX, mouseY }: Interactiv
   const springRotateX = useSpring(rotateX, { stiffness: 120, damping: 25 })
   const springRotateY = useSpring(rotateY, { stiffness: 120, damping: 25 })
 
-  // Initialize and ensure breathing idle video plays automatically
+  // Helper to ensure webkit-playsinline and muted are set at DOM level (critical for mobile WebKit)
+  const configureVideoDOM = (v: HTMLVideoElement | null) => {
+    if (!v) return
+    v.muted = true
+    v.defaultMuted = true
+    v.setAttribute("playsinline", "true")
+    v.setAttribute("webkit-playsinline", "true")
+  }
+
+  // Initialize videos on mount
   useEffect(() => {
+    const allVideos = [
+      idleVideoRef.current,
+      greetingVideoRef.current,
+      thumbsVideoRef.current,
+      glassVideoRef.current,
+      salchipapaVideoRef.current,
+    ]
+
+    allVideos.forEach(configureVideoDOM)
+
+    // Start idle video
     const idleVideo = idleVideoRef.current
     if (idleVideo) {
       idleVideo.play().catch(() => {})
     }
+  }, [])
+
+  // Safely pause and reset all reaction clips (except the currently playing one)
+  const stopOtherReactions = useCallback((exceptVideo?: HTMLVideoElement | null) => {
+    const reactionRefs = [greetingVideoRef, thumbsVideoRef, glassVideoRef, salchipapaVideoRef]
+    reactionRefs.forEach((ref) => {
+      const vid = ref.current
+      if (vid && vid !== exceptVideo) {
+        vid.pause()
+        vid.currentTime = 0
+      }
+    })
   }, [])
 
   // Return to breathing idle loop gracefully
   const returnToIdle = useCallback(() => {
+    activeStateRef.current = "idle"
     setActiveState("idle")
-    setStatusMessage("Tócame o pasa el cursor")
+    stopOtherReactions(null)
 
     const idleVideo = idleVideoRef.current
     if (idleVideo) {
       idleVideo.play().catch(() => {})
     }
-  }, [])
+  }, [stopOtherReactions])
+
+  // Play a specific reaction video from the beginning
+  const playReaction = useCallback((nextState: AvatarState) => {
+    activeStateRef.current = nextState
+    setActiveState(nextState)
+
+    const videoMap: Record<AvatarState, HTMLVideoElement | null> = {
+      greeting: greetingVideoRef.current,
+      thumbs: thumbsVideoRef.current,
+      glass: glassVideoRef.current,
+      salchipapa: salchipapaVideoRef.current,
+      idle: idleVideoRef.current,
+    }
+
+    const targetVideo = videoMap[nextState]
+
+    // Stop and reset all OTHER reaction videos so they don't consume hardware decoders or trigger ghost onEnded
+    stopOtherReactions(targetVideo)
+
+    if (targetVideo) {
+      configureVideoDOM(targetVideo)
+      targetVideo.currentTime = 0
+      const playPromise = targetVideo.play()
+      if (playPromise !== undefined) {
+        playPromise.catch((err) => {
+          console.warn("Avatar video play failed:", err)
+          if (activeStateRef.current === nextState) {
+            returnToIdle()
+          }
+        })
+      }
+    }
+  }, [stopOtherReactions, returnToIdle])
+
+  // Handlers when each reaction video finishes naturally
+  const handleVideoEnded = useCallback((finishedState: AvatarState) => {
+    // CRITICAL: Only return to idle if THIS video is still the active one!
+    // If user already tapped another reaction, do NOT cut off the new video!
+    if (activeStateRef.current === finishedState) {
+      returnToIdle()
+    }
+  }, [returnToIdle])
 
   // Advance animation on Click or Tap (iPad, iPhone, Android, PC)
   const handleInteraction = useCallback((e?: React.SyntheticEvent) => {
@@ -63,68 +141,39 @@ export function InteractiveAvatar({ className = "", mouseX, mouseY }: Interactiv
       e.stopPropagation()
     }
 
-    // Cycle through reactions: Saludo -> Thumbs up -> Vidrio roto -> Salchipapa
-    animationStepRef.current = (animationStepRef.current + 1) % 4
-
-    if (animationStepRef.current === 1) {
-      const v = thumbsVideoRef.current
-      if (v) {
-        v.currentTime = 0
-        v.play().then(() => {
-          setActiveState("thumbs")
-          setStatusMessage("Awesome! 🚀")
-        }).catch(() => {})
-      }
-    } else if (animationStepRef.current === 2) {
-      const v = glassVideoRef.current
-      if (v) {
-        v.currentTime = 0
-        v.play().then(() => {
-          setActiveState("glass")
-          setStatusMessage("Vidrio Roto! 💥")
-        }).catch(() => {})
-      }
-    } else if (animationStepRef.current === 3) {
-      const v = salchipapaVideoRef.current
-      if (v) {
-        v.currentTime = 0
-        v.play().then(() => {
-          setActiveState("salchipapa")
-          setStatusMessage("Salchipapa! 🍟")
-        }).catch(() => {})
-      }
-    } else {
-      const v = greetingVideoRef.current
-      if (v) {
-        v.currentTime = 0
-        v.play().then(() => {
-          setActiveState("greeting")
-          setStatusMessage("Hola! 👋")
-        }).catch(() => {})
-      }
+    // Debounce rapid accidental double-taps within 200ms
+    const now = Date.now()
+    if (now - lastInteractionTimeRef.current < 200) {
+      return
     }
-  }, [])
+    lastInteractionTimeRef.current = now
 
-  // Desktop Hover (only on devices with a mouse/trackpad pointer)
+    // Cycle sequentially: Saludo -> Thumbs up -> Vidrio roto -> Salchipapa -> Saludo...
+    reactionIndexRef.current = (reactionIndexRef.current + 1) % REACTION_STATES.length
+    const nextState = REACTION_STATES[reactionIndexRef.current]
+
+    playReaction(nextState)
+  }, [playReaction])
+
+  // Desktop Hover ONLY (Only on devices with a mouse/trackpad pointer)
   const handleMouseEnter = useCallback(() => {
-    if (activeState !== "idle") return
+    if (activeStateRef.current !== "idle") return
+    // CRITICAL: Never trigger on touch/mobile devices
     if (typeof window !== "undefined" && window.matchMedia("(pointer: fine)").matches) {
-      const v = greetingVideoRef.current
-      if (v) {
-        v.currentTime = 0
-        v.play().then(() => {
-          setActiveState("greeting")
-          setStatusMessage("Hola! 👋")
-        }).catch(() => {})
-      }
+      reactionIndexRef.current = 0
+      playReaction("greeting")
     }
-  }, [activeState])
+  }, [playReaction])
 
   const handleMouseLeave = useCallback(() => {
-    if (activeState === "greeting") {
-      returnToIdle()
+    // CRITICAL: On touch devices (iPhone, iPad, Android in vertical/horizontal),
+    // mouseleave must NEVER fire or cut off videos when lifting a finger or scrolling!
+    if (typeof window !== "undefined" && window.matchMedia("(pointer: fine)").matches) {
+      if (activeStateRef.current === "greeting") {
+        returnToIdle()
+      }
     }
-  }, [activeState, returnToIdle])
+  }, [returnToIdle])
 
   return (
     <motion.div
@@ -180,7 +229,7 @@ export function InteractiveAvatar({ className = "", mouseX, mouseY }: Interactiv
           muted
           playsInline
           preload="auto"
-          onEnded={returnToIdle}
+          onEnded={() => handleVideoEnded("greeting")}
           className={`absolute inset-0 w-full h-full object-cover object-top pointer-events-none transition-opacity duration-300 ease-in-out ${
             activeState === "greeting" ? "opacity-100 z-20" : "opacity-0 z-0"
           }`}
@@ -193,7 +242,7 @@ export function InteractiveAvatar({ className = "", mouseX, mouseY }: Interactiv
           muted
           playsInline
           preload="auto"
-          onEnded={returnToIdle}
+          onEnded={() => handleVideoEnded("thumbs")}
           className={`absolute inset-0 w-full h-full object-cover object-top pointer-events-none transition-opacity duration-300 ease-in-out ${
             activeState === "thumbs" ? "opacity-100 z-30" : "opacity-0 z-0"
           }`}
@@ -206,7 +255,7 @@ export function InteractiveAvatar({ className = "", mouseX, mouseY }: Interactiv
           muted
           playsInline
           preload="auto"
-          onEnded={returnToIdle}
+          onEnded={() => handleVideoEnded("glass")}
           className={`absolute inset-0 w-full h-full object-cover object-top pointer-events-none transition-opacity duration-300 ease-in-out ${
             activeState === "glass" ? "opacity-100 z-40" : "opacity-0 z-0"
           }`}
@@ -219,7 +268,7 @@ export function InteractiveAvatar({ className = "", mouseX, mouseY }: Interactiv
           muted
           playsInline
           preload="auto"
-          onEnded={returnToIdle}
+          onEnded={() => handleVideoEnded("salchipapa")}
           className={`absolute inset-0 w-full h-full object-cover object-top pointer-events-none transition-opacity duration-300 ease-in-out ${
             activeState === "salchipapa" ? "opacity-100 z-50" : "opacity-0 z-0"
           }`}

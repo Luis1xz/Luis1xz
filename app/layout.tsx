@@ -42,6 +42,9 @@ export default function RootLayout({
   return (
     <html lang="en" className="scroll-smooth">
       <head>
+        <link rel="icon" href="/icon.png" type="image/png" sizes="any" />
+        <link rel="shortcut icon" href="/icon.png" type="image/png" />
+        <link rel="apple-touch-icon" href="/apple-icon.png" sizes="180x180" />
         <style>{`
 html {
   font-family: ${GeistSans.style.fontFamily};

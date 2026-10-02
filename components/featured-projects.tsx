@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { ExternalLink, Github, Trophy, Cpu, Brain, ChevronDown, ChevronUp } from "lucide-react"
+import { ExternalLink, Github, Trophy, Cpu, Brain, ChevronDown, ChevronUp, Play } from "lucide-react"
 import { Tilt3DCard } from "@/components/tilt-3d-card"
 
 interface Project {
@@ -18,6 +18,7 @@ interface Project {
   result: string
   github?: string
   demo?: string
+  videoUrl?: string
   carousel?: { src: string; caption: string }[]
   highlight: boolean
 }
@@ -73,6 +74,21 @@ const projects: Project[] = [
       { src: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/sura%203.jpg-KvKdtZMGXmYuWi7l0Gy3HaD3fH38U1.jpeg", caption: "Team with certificates" },
     ],
   },
+  {
+    id: "uninorte",
+    badge: "Universidad del Norte · 700+ Asistentes",
+    badgeColor: "bg-red-500/20 text-red-300 border-red-500/30",
+    icon: <Play className="w-5 h-5 text-red-400" />,
+    title: "Entrevista Uninorte",
+    subtitle: "Apertura Skill Challenge ante 700+ asistentes",
+    problem: "Compartir la experiencia en robótica competitiva y motivar a cientos de jóvenes estudiantes a involucrarse en ciencia, tecnología e ingeniería.",
+    solution: "Acompañé y apoyé a la Universidad del Norte en la inauguración del Skill Challenge, brindando una entrevista y discurso motivacional sobre disciplina, superación y robótica.",
+    tech: ["Oratoria", "Liderazgo", "Divulgación Científica", "Robótica", "Universidad del Norte"],
+    result: "Discurso y entrevista frente a más de 700 asistentes, transmitido en canales oficiales de Uninorte.",
+    highlight: true,
+    videoUrl: "https://www.youtube.com/embed/rNxhNOWBpas",
+    demo: "https://youtube.com/shorts/rNxhNOWBpas?feature=share",
+  },
 ]
 
 function ProjectCard({ project }: { project: Project }) {
@@ -87,6 +103,25 @@ function ProjectCard({ project }: { project: Project }) {
           : "border-purple-500/20 bg-gray-900/50"
       }`}
     >
+      {/* Video Embed */}
+      {project.videoUrl && (
+        <div className="relative h-64 sm:h-72 overflow-hidden bg-black flex items-center justify-center">
+          <iframe
+            src={project.videoUrl}
+            title={project.title}
+            className="w-full h-full object-cover"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+          />
+          <div className="absolute top-3 left-3 z-20 pointer-events-none">
+            <span className={`text-xs font-medium px-2.5 py-1 rounded-full border backdrop-blur-md shadow-md ${project.badgeColor}`}>
+              {project.badge}
+            </span>
+          </div>
+        </div>
+      )}
+
+      {/* Image Carousel */}
       {project.carousel && (
         <div className="relative h-64 sm:h-72 overflow-hidden bg-gray-950 flex items-center justify-center">
           {/* Ambient blurred backdrop fills the container with the photo's colors smoothly */}

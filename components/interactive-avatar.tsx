@@ -2,9 +2,9 @@
 
 import { useEffect, useRef, useState, useCallback } from "react"
 import { motion, useMotionValue, useTransform, useSpring } from "framer-motion"
-import { Sparkles, Hand, ThumbsUp, Zap } from "lucide-react"
+import { Sparkles, Hand, ThumbsUp, Zap, Utensils } from "lucide-react"
 
-type AvatarState = "idle" | "greeting" | "thumbs" | "glass"
+type AvatarState = "idle" | "greeting" | "thumbs" | "glass" | "salchipapa"
 
 interface InteractiveAvatarProps {
   className?: string
@@ -16,11 +16,12 @@ export function InteractiveAvatar({ className = "", mouseX, mouseY }: Interactiv
   const [activeState, setActiveState] = useState<AvatarState>("idle")
   const [statusMessage, setStatusMessage] = useState("Tócame o pasa el cursor")
 
-  // Refs for all 4 individual video instances
-  const idleVideoRef = useRef<HTMLVideoElement | null>(null)     // clip1: Respiración / Idle continuo
-  const greetingVideoRef = useRef<HTMLVideoElement | null>(null) // clip2: Saludo
-  const thumbsVideoRef = useRef<HTMLVideoElement | null>(null)   // clip3: Thumbs up / Guiño
-  const glassVideoRef = useRef<HTMLVideoElement | null>(null)    // clip5: Vidrio roto
+  // Refs for all 5 individual video instances
+  const idleVideoRef = useRef<HTMLVideoElement | null>(null)       // clip1: Respiración / Idle continuo
+  const greetingVideoRef = useRef<HTMLVideoElement | null>(null)   // clip2: Saludo
+  const thumbsVideoRef = useRef<HTMLVideoElement | null>(null)     // clip3: Thumbs up / Guiño
+  const glassVideoRef = useRef<HTMLVideoElement | null>(null)      // clip5: Vidrio roto
+  const salchipapaVideoRef = useRef<HTMLVideoElement | null>(null) // clip6: Salchipapa
 
   const animationStepRef = useRef<number>(0)
 
@@ -60,8 +61,8 @@ export function InteractiveAvatar({ className = "", mouseX, mouseY }: Interactiv
       e.stopPropagation()
     }
 
-    // Cycle through reactions: Saludo -> Thumbs up -> Vidrio roto
-    animationStepRef.current = (animationStepRef.current + 1) % 3
+    // Cycle through reactions: Saludo -> Thumbs up -> Vidrio roto -> Salchipapa
+    animationStepRef.current = (animationStepRef.current + 1) % 4
 
     if (animationStepRef.current === 1) {
       const v = thumbsVideoRef.current
@@ -79,6 +80,15 @@ export function InteractiveAvatar({ className = "", mouseX, mouseY }: Interactiv
         v.play().then(() => {
           setActiveState("glass")
           setStatusMessage("Vidrio Roto! 💥")
+        }).catch(() => {})
+      }
+    } else if (animationStepRef.current === 3) {
+      const v = salchipapaVideoRef.current
+      if (v) {
+        v.currentTime = 0
+        v.play().then(() => {
+          setActiveState("salchipapa")
+          setStatusMessage("Salchipapa! 🍟")
         }).catch(() => {})
       }
     } else {
@@ -199,6 +209,19 @@ export function InteractiveAvatar({ className = "", mouseX, mouseY }: Interactiv
             activeState === "glass" ? "opacity-100 z-40" : "opacity-0 z-0"
           }`}
         />
+
+        {/* 5. ESTADO: SALCHIPAPA (clip6) */}
+        <video
+          ref={salchipapaVideoRef}
+          src="/avatar/clip6.mp4"
+          muted
+          playsInline
+          preload="auto"
+          onEnded={returnToIdle}
+          className={`absolute inset-0 w-full h-full object-cover object-top pointer-events-none transition-opacity duration-300 ease-in-out ${
+            activeState === "salchipapa" ? "opacity-100 z-50" : "opacity-0 z-0"
+          }`}
+        />
       </div>
 
       {/* Floating Interactive Badge Indicator */}
@@ -217,6 +240,7 @@ export function InteractiveAvatar({ className = "", mouseX, mouseY }: Interactiv
           {activeState === "greeting" && <Hand className="w-3.5 h-3.5 text-cyan-400 animate-bounce" />}
           {activeState === "thumbs" && <ThumbsUp className="w-3.5 h-3.5 text-pink-400 animate-pulse" />}
           {activeState === "glass" && <Zap className="w-3.5 h-3.5 text-yellow-400 animate-bounce" />}
+          {activeState === "salchipapa" && <Utensils className="w-3.5 h-3.5 text-amber-400 animate-bounce" />}
           <span>{statusMessage}</span>
         </span>
       </motion.div>

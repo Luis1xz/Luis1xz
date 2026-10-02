@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { Briefcase, ChevronDown, ChevronUp } from "lucide-react"
+import { Tilt3DCard } from "@/components/tilt-3d-card"
 
 const experiences = [
   {
@@ -79,21 +80,24 @@ const experiences = [
 function ExperienceCard({ exp }: { exp: typeof experiences[0] }) {
   const [expanded, setExpanded] = useState(false)
   return (
-    <div className={`p-5 rounded-xl border ${exp.color} hover:shadow-lg hover:shadow-purple-500/10 transition-all duration-300`}>
+    <Tilt3DCard
+      tiltDegree={6}
+      className={`p-5 rounded-2xl border ${exp.color} hover:shadow-xl hover:shadow-purple-500/20 transition-all duration-300`}
+    >
       <div className="flex items-start justify-between gap-4">
         <div className="flex items-start gap-3">
-          <div className="p-2 rounded-lg bg-purple-500/10 mt-0.5">
+          <div className="p-2.5 rounded-xl bg-purple-500/10 mt-0.5">
             <Briefcase className="w-4 h-4 text-purple-400" />
           </div>
           <div>
-            <h3 className="font-semibold text-white">{exp.company}</h3>
+            <h3 className="font-semibold text-white text-base">{exp.company}</h3>
             <p className={`text-sm ${exp.accent} font-medium`}>{exp.role}</p>
-            <p className="text-xs text-purple-300/40 mt-0.5">{exp.location} · {exp.period}</p>
+            <p className="text-xs text-purple-300/50 mt-0.5">{exp.location} · {exp.period}</p>
           </div>
         </div>
         <button
           onClick={() => setExpanded(!expanded)}
-          className="text-purple-400/50 hover:text-purple-300 transition-colors flex-shrink-0 mt-1"
+          className="text-purple-400/50 hover:text-purple-300 transition-colors flex-shrink-0 mt-1 p-1 rounded-lg hover:bg-white/5"
           aria-label={expanded ? "Collapse" : "Expand"}
         >
           {expanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
@@ -107,17 +111,17 @@ function ExperienceCard({ exp }: { exp: typeof experiences[0] }) {
             exit={{ opacity: 0, height: 0 }}
             className="overflow-hidden"
           >
-            <div className="mt-4 pt-4 border-t border-purple-500/10">
-              <p className="text-sm text-purple-300/50 mb-3">{exp.description}</p>
+            <div className="mt-4 pt-4 border-t border-purple-500/15">
+              <p className="text-sm text-purple-300/60 mb-3">{exp.description}</p>
               {"highlight" in exp && exp.highlight && (
-                <div className="mb-3 px-3 py-2 rounded-lg bg-green-500/10 border border-green-500/20">
+                <div className="mb-3 px-3.5 py-2 rounded-xl bg-green-500/10 border border-green-500/20 shadow-sm">
                   <p className="text-xs font-mono text-green-400">⚡ {exp.highlight}</p>
                 </div>
               )}
               <ul className="space-y-1.5">
                 {exp.responsibilities.map((r, i) => (
-                  <li key={i} className="flex items-start gap-2 text-sm text-purple-200/60">
-                    <span className={`mt-1.5 w-1 h-1 rounded-full flex-shrink-0 ${exp.dotColor}`} />
+                  <li key={i} className="flex items-start gap-2 text-sm text-purple-200/70">
+                    <span className={`mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 ${exp.dotColor}`} />
                     {r}
                   </li>
                 ))}
@@ -126,7 +130,7 @@ function ExperienceCard({ exp }: { exp: typeof experiences[0] }) {
           </motion.div>
         )}
       </AnimatePresence>
-    </div>
+    </Tilt3DCard>
   )
 }
 

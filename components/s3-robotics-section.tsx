@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion"
 import { Trophy, Users, Cpu, Target } from "lucide-react"
+import { Tilt3DCard } from "@/components/tilt-3d-card"
 
 const achievements = [
   {
@@ -65,38 +66,42 @@ export function S3RoboticsSection() {
           <div className="lg:col-span-2 space-y-4">
             <p className="text-xs font-mono text-purple-400/60 uppercase tracking-wider mb-6">Results</p>
             {achievements.map((a, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, x: -20 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.5, delay: i * 0.1 }}
-                viewport={{ once: true }}
-                className={`p-5 rounded-xl border ${a.border} ${a.bg} flex items-center gap-6 hover:shadow-lg hover:shadow-purple-500/10 transition-all`}
-              >
-                <div className={`text-5xl font-bold ${a.color} min-w-[60px] text-center`}>{a.place}</div>
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className={a.color}>{a.icon}</span>
-                    <h3 className="font-semibold text-white">{a.competition}</h3>
+              <Tilt3DCard key={i} className="mb-4">
+                <div
+                  className={`p-5 rounded-2xl border ${a.border} ${a.bg} flex items-center gap-6 hover:shadow-xl hover:shadow-purple-500/20 transition-all`}
+                >
+                  <div className={`text-5xl font-bold ${a.color} min-w-[60px] text-center`}>{a.place}</div>
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className={a.color}>{a.icon}</span>
+                      <h3 className="font-semibold text-white">{a.competition}</h3>
+                    </div>
+                    <p className="text-sm text-purple-300/60">{a.category}</p>
                   </div>
-                  <p className="text-sm text-purple-300/60">{a.category}</p>
+                  <span className="text-xs font-mono text-purple-400/50 px-2.5 py-1 rounded-full bg-purple-500/10 border border-purple-500/20">
+                    {a.year}
+                  </span>
                 </div>
-                <span className="text-xs font-mono text-purple-400/50 px-2 py-1 rounded bg-purple-500/10 border border-purple-500/20">{a.year}</span>
-              </motion.div>
+              </Tilt3DCard>
             ))}
-            <motion.div
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              transition={{ duration: 0.8, delay: 0.2 }}
-              viewport={{ once: true }}
-              className="mt-6 rounded-xl overflow-hidden border border-purple-500/20"
-            >
-              <img
-                src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Imagen%20de%20WhatsApp%202025-08-18%20a%20las%2020.55.45_073c123e.jpg-hL9T9zDRJAvHaWOpH2kQIFXKYo0Ic7.jpeg"
-                alt="S3 Robotics team"
-                className="w-full object-cover max-h-64"
-              />
-            </motion.div>
+
+            {/* S3 Team Photo - 100% visible, no cropped heads */}
+            <Tilt3DCard className="mt-6">
+              <div className="rounded-2xl overflow-hidden border border-purple-500/30 bg-gray-950 relative flex items-center justify-center min-h-[300px] sm:min-h-[380px] shadow-2xl shadow-purple-500/10 group">
+                {/* Ambient glow matching photo colors */}
+                <img
+                  src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Imagen%20de%20WhatsApp%202025-08-18%20a%20las%2020.55.45_073c123e.jpg-hL9T9zDRJAvHaWOpH2kQIFXKYo0Ic7.jpeg"
+                  alt=""
+                  aria-hidden="true"
+                  className="absolute inset-0 w-full h-full object-cover blur-2xl opacity-35 scale-110 pointer-events-none"
+                />
+                <img
+                  src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Imagen%20de%20WhatsApp%202025-08-18%20a%20las%2020.55.45_073c123e.jpg-hL9T9zDRJAvHaWOpH2kQIFXKYo0Ic7.jpeg"
+                  alt="S3 Robotics team and robot"
+                  className="relative z-10 w-full h-auto max-h-[460px] object-contain mx-auto transition-transform duration-500 group-hover:scale-[1.02]"
+                />
+              </div>
+            </Tilt3DCard>
           </div>
 
           {/* Sidebar */}

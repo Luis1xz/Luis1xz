@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { ExternalLink, Github, Trophy, Cpu, Brain, ChevronDown, ChevronUp } from "lucide-react"
+import { Tilt3DCard } from "@/components/tilt-3d-card"
 
 interface Project {
   id: string
@@ -79,42 +80,48 @@ function ProjectCard({ project }: { project: Project }) {
   const [imgIdx, setImgIdx] = useState(0)
 
   return (
-    <motion.div
-      layout
-      className={`border rounded-xl overflow-hidden transition-all duration-300 hover:shadow-xl ${
+    <Tilt3DCard
+      className={`border rounded-2xl overflow-hidden transition-all duration-300 ${
         project.highlight
-          ? "border-purple-500/40 bg-gray-900/60 hover:shadow-purple-500/20"
-          : "border-purple-500/20 bg-gray-900/40 hover:shadow-purple-500/10"
+          ? "border-purple-500/40 bg-gray-900/70"
+          : "border-purple-500/20 bg-gray-900/50"
       }`}
     >
       {project.carousel && (
-        <div className="relative aspect-video overflow-hidden bg-gray-900">
+        <div className="relative h-64 sm:h-72 overflow-hidden bg-gray-950 flex items-center justify-center">
+          {/* Ambient blurred backdrop fills the container with the photo's colors smoothly */}
+          <img
+            src={project.carousel[imgIdx].src}
+            alt=""
+            aria-hidden="true"
+            className="absolute inset-0 w-full h-full object-cover blur-2xl opacity-40 scale-110 pointer-events-none"
+          />
           <AnimatePresence mode="wait">
             <motion.img
               key={imgIdx}
               src={project.carousel[imgIdx].src}
               alt={project.carousel[imgIdx].caption}
-              className="w-full h-full object-cover"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.4 }}
+              className="relative z-10 w-full h-full object-contain object-center transition-all duration-300"
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              transition={{ duration: 0.3 }}
             />
           </AnimatePresence>
           {project.carousel.length > 1 && (
-            <div className="absolute bottom-3 left-0 right-0 flex justify-center gap-1.5">
+            <div className="absolute bottom-3 left-0 right-0 z-20 flex justify-center gap-1.5">
               {project.carousel.map((_, i) => (
                 <button
                   key={i}
                   onClick={() => setImgIdx(i)}
-                  className={`w-2 h-2 rounded-full transition-all ${i === imgIdx ? "bg-purple-400 scale-125" : "bg-purple-400/30"}`}
+                  className={`w-2 h-2 rounded-full transition-all ${i === imgIdx ? "bg-cyan-400 scale-125 shadow-lg shadow-cyan-400/50" : "bg-white/40"}`}
                   aria-label={`Image ${i + 1}`}
                 />
               ))}
             </div>
           )}
-          <div className="absolute top-3 left-3">
-            <span className={`text-xs font-medium px-2.5 py-1 rounded-full border backdrop-blur-sm ${project.badgeColor}`}>
+          <div className="absolute top-3 left-3 z-20">
+            <span className={`text-xs font-medium px-2.5 py-1 rounded-full border backdrop-blur-md shadow-md ${project.badgeColor}`}>
               {project.badge}
             </span>
           </div>
@@ -210,7 +217,7 @@ function ProjectCard({ project }: { project: Project }) {
           </button>
         </div>
       </div>
-    </motion.div>
+    </Tilt3DCard>
   )
 }
 

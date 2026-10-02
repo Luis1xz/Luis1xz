@@ -126,10 +126,10 @@ export function InteractiveAvatar({ className = "", mouseX, mouseY }: Interactiv
 
       {/* Video Container with Radial Edge Camouflage to eliminate rectangular borders */}
       <div
-        className="relative w-[300px] h-[380px] sm:w-[340px] sm:h-[420px] rounded-3xl overflow-hidden bg-transparent transition-transform duration-300 group-hover:scale-[1.02]"
+        className="relative w-[310px] h-[410px] sm:w-[350px] sm:h-[460px] rounded-3xl overflow-hidden bg-transparent transition-transform duration-300 group-hover:scale-[1.02]"
         style={{
-          WebkitMaskImage: "radial-gradient(ellipse 85% 90% at 50% 50%, black 70%, transparent 100%)",
-          maskImage: "radial-gradient(ellipse 85% 90% at 50% 50%, black 70%, transparent 100%)",
+          WebkitMaskImage: "radial-gradient(ellipse 90% 92% at 50% 50%, black 72%, transparent 100%)",
+          maskImage: "radial-gradient(ellipse 90% 92% at 50% 50%, black 72%, transparent 100%)",
         }}
       >
         {/* 1. STATE: IDLE (Continuous ambient loop) */}
@@ -141,7 +141,7 @@ export function InteractiveAvatar({ className = "", mouseX, mouseY }: Interactiv
           muted
           playsInline
           preload="auto"
-          className={`absolute inset-0 w-full h-full object-cover object-center pointer-events-none transition-opacity duration-300 ease-in-out ${
+          className={`absolute inset-0 w-full h-full object-cover object-top pointer-events-none transition-opacity duration-300 ease-in-out ${
             activeState === "idle" ? "opacity-100 z-10" : "opacity-0 z-0"
           }`}
         />
@@ -154,7 +154,7 @@ export function InteractiveAvatar({ className = "", mouseX, mouseY }: Interactiv
           playsInline
           preload="auto"
           onEnded={handleHoverEnded}
-          className={`absolute inset-0 w-full h-full object-cover object-center pointer-events-none transition-opacity duration-300 ease-in-out ${
+          className={`absolute inset-0 w-full h-full object-cover object-top pointer-events-none transition-opacity duration-300 ease-in-out ${
             activeState === "hover" ? "opacity-100 z-20" : "opacity-0 z-0"
           }`}
         />
@@ -167,7 +167,7 @@ export function InteractiveAvatar({ className = "", mouseX, mouseY }: Interactiv
           playsInline
           preload="auto"
           onEnded={handleClickEnded}
-          className={`absolute inset-0 w-full h-full object-cover object-center pointer-events-none transition-opacity duration-300 ease-in-out ${
+          className={`absolute inset-0 w-full h-full object-cover object-top pointer-events-none transition-opacity duration-300 ease-in-out ${
             activeState === "click" ? "opacity-100 z-30" : "opacity-0 z-0"
           }`}
         />

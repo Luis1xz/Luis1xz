@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { X, Cpu, Thermometer, Globe, Wifi, Brain, Heart } from "lucide-react"
+import { Tilt3DCard } from "@/components/tilt-3d-card"
 
 interface Experiment {
   id: string
@@ -129,34 +130,37 @@ export function LuisLab() {
           {experiments.map((exp, i) => {
             const status = statusConfig[exp.status]
             return (
-              <motion.button
+              <motion.div
                 key={exp.id}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: i * 0.07 }}
                 viewport={{ once: true }}
-                whileHover={{ y: -4 }}
-                onClick={() => setSelected(exp)}
-                className={`text-left p-5 rounded-xl border ${status.border} ${status.bg} bg-gray-900/50 hover:border-purple-400/50 hover:shadow-lg hover:shadow-purple-500/15 transition-all duration-300 group`}
               >
-                <div className="flex items-start justify-between mb-4">
-                  <div className="p-2 rounded-lg bg-purple-500/10 text-purple-400 group-hover:text-white group-hover:bg-purple-500/20 transition-all">
-                    {exp.icon}
+                <Tilt3DCard
+                  tiltDegree={9}
+                  onClick={() => setSelected(exp)}
+                  className={`text-left p-5 rounded-2xl border ${status.border} ${status.bg} bg-gray-900/60 hover:border-purple-400/60 cursor-pointer transition-all duration-300 group`}
+                >
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="p-2.5 rounded-xl bg-purple-500/10 text-purple-400 group-hover:text-cyan-300 group-hover:bg-purple-500/25 transition-all">
+                      {exp.icon}
+                    </div>
+                    <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-black/40 border border-white/5">
+                      <span className={`w-2 h-2 rounded-full ${status.dot} ${exp.status === "active" ? "animate-pulse shadow-sm shadow-green-400" : ""}`} />
+                      <span className={`text-xs font-mono font-medium ${status.color}`}>{status.label}</span>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-1.5">
-                    <span className={`w-1.5 h-1.5 rounded-full ${status.dot} ${exp.status === "active" ? "animate-pulse" : ""}`} />
-                    <span className={`text-xs font-mono ${status.color}`}>{status.label}</span>
+                  <h3 className="font-semibold text-white text-base mb-1 group-hover:text-purple-200 transition-colors">{exp.title}</h3>
+                  <p className="text-xs text-purple-300/60 mb-3">{exp.subtitle}</p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {exp.tech.slice(0, 3).map((t) => (
+                      <span key={t} className="text-xs px-2 py-0.5 rounded-md bg-purple-500/10 text-purple-300 border border-purple-400/20">{t}</span>
+                    ))}
+                    {exp.tech.length > 3 && <span className="text-xs text-purple-400/50">+{exp.tech.length - 3}</span>}
                   </div>
-                </div>
-                <h3 className="font-semibold text-white text-sm mb-1 group-hover:text-purple-200 transition-colors">{exp.title}</h3>
-                <p className="text-xs text-purple-300/40 mb-3">{exp.subtitle}</p>
-                <div className="flex flex-wrap gap-1">
-                  {exp.tech.slice(0, 3).map((t) => (
-                    <span key={t} className="text-xs px-1.5 py-0.5 rounded bg-purple-500/10 text-purple-400/60 border border-purple-400/15">{t}</span>
-                  ))}
-                  {exp.tech.length > 3 && <span className="text-xs text-purple-400/30">+{exp.tech.length - 3}</span>}
-                </div>
-              </motion.button>
+                </Tilt3DCard>
+              </motion.div>
             )
           })}
         </div>

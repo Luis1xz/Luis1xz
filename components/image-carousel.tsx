@@ -63,35 +63,24 @@ export function ImageCarousel({ images, className = "" }: ImageCarouselProps) {
             transition={{ duration: 0.3 }}
             className="relative"
           >
-            <img
-              src={images[currentIndex].src || "/placeholder.svg"}
-              alt={images[currentIndex].alt}
-              className={`w-full ${
-                isBarranquillaIA
-                  ? "h-80 md:h-96 object-contain" // Barranquilla-IA: mostrar foto completa sin cortes
-                  : isCaribeConf && currentIndex === images.length - 1
-                    ? "h-80 md:h-96 object-cover object-[center_40%]" // CaribeConf última imagen: bajar más para ver el nombre en la escarapela
-                    : isCaribeConf
-                      ? "h-80 md:h-96 object-cover object-[center_30%]" // CaribeConf otras imágenes: enfoque en cara y escarapela
-                      : isSURA && currentIndex === 0
-                        ? "h-64 md:h-80 object-cover object-[center_25%]" // SURA primera imagen: ajustar para ver la cara
-                        : isSURA
-                          ? "h-64 md:h-80 object-cover object-center" // SURA otras imágenes: mantener configuración original
-                          : isS3Robotics
-                            ? "h-64 md:h-80 object-cover object-[center_20%]" // S3 Robotics: subir imagen para ver mejor las caras del equipo
-                            : isNASA
-                              ? "h-64 md:h-80 object-cover object-[center_25%]" // NASA Space Apps: enfocar en rostros
-                              : isColCom && currentIndex === 2
-                                ? "h-64 md:h-80 object-cover object-[center_20%]" // ColCom 3ra imagen: subir para ver la cara
-                                : isColCom
-                                  ? "h-64 md:h-80 object-cover object-center" // ColCom otras imágenes: configuración normal
-                                  : "h-64 md:h-80 object-cover object-center" // Otros: configuración normal
-              }`}
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
+            <div className="relative w-full h-80 sm:h-96 md:h-[420px] bg-black/60 flex items-center justify-center overflow-hidden">
+              {/* Ambient blurred backdrop so any aspect ratio fills seamlessly */}
+              <img
+                src={images[currentIndex].src || "/placeholder.svg"}
+                alt=""
+                aria-hidden="true"
+                className="absolute inset-0 w-full h-full object-cover blur-2xl opacity-40 scale-110 pointer-events-none"
+              />
+              <img
+                src={images[currentIndex].src || "/placeholder.svg"}
+                alt={images[currentIndex].alt}
+                className="relative z-10 max-h-full max-w-full object-contain mx-auto"
+              />
+            </div>
+            <div className="absolute inset-0 pointer-events-none bg-gradient-to-t from-black/60 via-transparent to-transparent" />
             {images[currentIndex].caption && (
-              <div className="absolute bottom-4 left-4 right-4">
-                <p className="text-white text-sm bg-black/50 backdrop-blur-sm rounded px-3 py-2">
+              <div className="absolute bottom-4 left-4 right-4 z-20">
+                <p className="text-white text-sm bg-black/70 backdrop-blur-md rounded-lg px-3.5 py-2 border border-white/10 shadow-lg inline-block">
                   {images[currentIndex].caption}
                 </p>
               </div>

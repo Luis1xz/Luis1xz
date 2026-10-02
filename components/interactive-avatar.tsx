@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, useCallback } from "react"
 import { motion, useMotionValue, useTransform, useSpring } from "framer-motion"
 import { Sparkles, Hand, ThumbsUp, Zap, Utensils } from "lucide-react"
+import { useLanguage } from "@/context/language-context"
 
 type AvatarState = "idle" | "greeting" | "thumbs" | "glass" | "salchipapa"
 
@@ -13,6 +14,7 @@ interface InteractiveAvatarProps {
 }
 
 export function InteractiveAvatar({ className = "", mouseX, mouseY }: InteractiveAvatarProps) {
+  const { t } = useLanguage()
   const [activeState, setActiveState] = useState<AvatarState>("idle")
   const [statusMessage, setStatusMessage] = useState("Tócame o pasa el cursor")
 
@@ -241,7 +243,13 @@ export function InteractiveAvatar({ className = "", mouseX, mouseY }: Interactiv
           {activeState === "thumbs" && <ThumbsUp className="w-3.5 h-3.5 text-pink-400 animate-pulse" />}
           {activeState === "glass" && <Zap className="w-3.5 h-3.5 text-yellow-400 animate-bounce" />}
           {activeState === "salchipapa" && <Utensils className="w-3.5 h-3.5 text-amber-400 animate-bounce" />}
-          <span>{statusMessage}</span>
+          <span>
+            {activeState === "greeting" && t("¡Hola! 👋", "Hello! 👋")}
+            {activeState === "thumbs" && t("¡Genial! 🚀", "Awesome! 🚀")}
+            {activeState === "glass" && t("¡Vidrio Roto! 💥", "Broken Glass! 💥")}
+            {activeState === "salchipapa" && t("¡Salchipapa! 🍟", "Salchipapa time! 🍟")}
+            {activeState === "idle" && t("Tócame o pasa el cursor", "Touch me or hover")}
+          </span>
         </span>
       </motion.div>
     </motion.div>

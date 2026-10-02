@@ -4,10 +4,15 @@ import { useEffect, useRef, useState } from "react"
 import { motion, useMotionValue } from "framer-motion"
 import { ArrowDown, Download, Github, Linkedin } from "lucide-react"
 import { InteractiveAvatar } from "@/components/interactive-avatar"
+import { useLanguage } from "@/context/language-context"
 
-const words = ["Robotics", "AI", "Software", "STEM", "Biomedical"]
+const wordsEs = ["Robótica", "IA", "Software", "Educación STEM", "Biomédica"]
+const wordsEn = ["Robotics", "AI", "Software", "STEM Education", "Biomedical"]
 
 export function HeroSection() {
+  const { language, t } = useLanguage()
+  const words = language === "es" ? wordsEs : wordsEn
+
   const mouseX = useMotionValue(0)
   const mouseY = useMotionValue(0)
   const [wordIndex, setWordIndex] = useState(0)
@@ -64,7 +69,7 @@ export function HeroSection() {
             className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-purple-500/30 bg-purple-500/10 text-purple-300 text-sm"
           >
             <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
-            Based in Barranquilla, Colombia
+            {t("Radicado en Barranquilla, Colombia", "Based in Barranquilla, Colombia")}
           </motion.div>
 
           {/* Name */}
@@ -88,7 +93,7 @@ export function HeroSection() {
             transition={{ duration: 0.6, delay: 0.3 }}
             className="flex items-center gap-3"
           >
-            <span className="text-purple-300/70 text-lg">Building in</span>
+            <span className="text-purple-300/70 text-lg">{t("Construyendo en", "Building in")}</span>
             <span className="text-xl font-semibold text-cyan-400 min-w-[140px]">
               {displayed}<span className="animate-pulse text-purple-400">|</span>
             </span>
@@ -101,7 +106,7 @@ export function HeroSection() {
             transition={{ duration: 0.7, delay: 0.4 }}
             className="text-xl md:text-2xl text-gray-300 font-light leading-relaxed max-w-lg"
           >
-            I build technology with purpose.
+            {t("Construyo tecnología con propósito.", "I build technology with purpose.")}
           </motion.p>
 
           {/* Degree badges */}
@@ -115,14 +120,14 @@ export function HeroSection() {
               <span className="text-blue-400 text-lg">🎓</span>
               <div>
                 <p className="text-xs text-blue-400/60">2024–2029</p>
-                <p className="text-sm font-medium text-white">Ingeniería de Sistemas</p>
+                <p className="text-sm font-medium text-white">{t("Ingeniería de Sistemas", "Systems Engineering")}</p>
               </div>
             </div>
             <div className="flex items-center gap-2 px-4 py-2 rounded-lg border border-violet-500/30 bg-gradient-to-r from-violet-500/10 to-purple-500/10">
               <span className="text-violet-400 text-lg">🧬</span>
               <div>
                 <p className="text-xs text-violet-400/60">2026–2030</p>
-                <p className="text-sm font-medium text-white">Ingeniería Biomédica</p>
+                <p className="text-sm font-medium text-white">{t("Ingeniería Biomédica", "Biomedical Engineering")}</p>
               </div>
             </div>
           </motion.div>
@@ -149,7 +154,7 @@ export function HeroSection() {
               whileTap={{ scale: 0.97 }}
               className="px-6 py-3 bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white font-semibold rounded-lg transition-all text-sm shadow-lg shadow-purple-500/25"
             >
-              Explore My Work
+              {t("Explorar Proyectos", "Explore My Work")}
             </motion.a>
             <motion.a
               href="#story"
@@ -157,7 +162,7 @@ export function HeroSection() {
               whileTap={{ scale: 0.97 }}
               className="px-6 py-3 border border-purple-500/40 hover:border-purple-400/70 text-purple-300 hover:text-white font-medium rounded-lg transition-all text-sm bg-purple-500/5 hover:bg-purple-500/10"
             >
-              My Story
+              {t("Mi Historia", "My Story")}
             </motion.a>
             <motion.a
               href="https://drive.google.com/file/d/1NDWC_kqXmsLt0-Lt1efEcnVa9GrmLXg8/view?usp=drive_link"
@@ -168,7 +173,7 @@ export function HeroSection() {
               className="px-6 py-3 border border-cyan-500/30 hover:border-cyan-400/60 text-cyan-400 hover:text-white font-medium rounded-lg transition-all text-sm flex items-center gap-2 bg-cyan-500/5"
             >
               <Download className="w-4 h-4" />
-              Resume
+              {t("Currículum", "Resume")}
             </motion.a>
           </motion.div>
 

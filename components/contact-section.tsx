@@ -2,8 +2,11 @@
 
 import { motion } from "framer-motion"
 import { Mail, Linkedin, Github, MapPin } from "lucide-react"
+import { useLanguage } from "@/context/language-context"
 
 export function ContactSection() {
+  const { t } = useLanguage()
+
   return (
     <section id="contact" className="py-24 px-6 border-t border-purple-500/10">
       <div className="max-w-7xl mx-auto">
@@ -14,12 +17,17 @@ export function ContactSection() {
           viewport={{ once: true }}
           className="text-center mb-16"
         >
-          <p className="text-xs font-mono text-purple-400 tracking-widest uppercase mb-4">Contact</p>
+          <p className="text-xs font-mono text-purple-400 tracking-widest uppercase mb-4">
+            {t("Contacto", "Contact")}
+          </p>
           <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-purple-400 via-pink-400 to-blue-400 bg-clip-text text-transparent mb-4">
-            Let&apos;s build something.
+            {t("Construyamos algo juntos.", "Let's build something.")}
           </h2>
           <p className="text-purple-300/60 max-w-xl mx-auto">
-            Robotics, software, AI, biomedical technology or STEM education — if it involves building something meaningful, I&apos;m interested.
+            {t(
+              "Robótica, software, IA, tecnología biomédica o educación STEM — si implica construir algo significativo, me interesa.",
+              "Robotics, software, AI, biomedical technology or STEM education — if it involves building something meaningful, I'm interested."
+            )}
           </p>
         </motion.div>
 
@@ -37,7 +45,7 @@ export function ContactSection() {
             className="flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white font-semibold rounded-xl transition-all shadow-lg shadow-purple-500/30"
           >
             <Mail className="w-5 h-5" />
-            Email Me
+            {t("Envíame un correo", "Email Me")}
           </motion.a>
 
           <div className="flex gap-3">

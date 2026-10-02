@@ -15,27 +15,30 @@ import { SkillsSection } from "@/components/skills-section"
 import { ContactSection } from "@/components/contact-section"
 import { Footer } from "@/components/footer"
 import { GradientBackground } from "@/components/gradient-background"
+import { LanguageProvider } from "@/context/language-context"
 
 export default function Home() {
   return (
-    <main className="relative min-h-screen">
-      <GradientBackground />
-      <div className="relative z-10">
-        <Navbar />
-        <HeroSection />
-        <CurrentlyBuilding />
-        <FeaturedProjects />
-        <S3RoboticsSection />
-        <LuisLab />
-        <ImpactSection />
-        <StorySection />
-        <EducationSection />
-        <ExperienceSection />
-        <CommunitySection />
-        <SkillsSection />
-        <ContactSection />
-        <Footer />
-      </div>
-    </main>
+    <LanguageProvider>
+      <main className="relative min-h-screen">
+        <GradientBackground />
+        <div className="relative z-10">
+          <Navbar />
+          <HeroSection />
+          <CurrentlyBuilding />
+          <FeaturedProjects />
+          <S3RoboticsSection />
+          <LuisLab />
+          <ImpactSection />
+          <StorySection />
+          <EducationSection />
+          <ExperienceSection />
+          <CommunitySection />
+          <SkillsSection />
+          <ContactSection />
+          <Footer />
+        </div>
+      </main>
+    </LanguageProvider>
   )
 }

@@ -4,7 +4,7 @@ import { useEffect, useRef, useState, useCallback } from "react"
 import { motion, useMotionValue, useTransform, useSpring } from "framer-motion"
 import { Sparkles, Hand, ThumbsUp, Zap } from "lucide-react"
 
-type AvatarState = "idle" | "hover" | "click1" | "click2"
+type AvatarState = "idle" | "greeting" | "thumbs" | "glass"
 
 interface InteractiveAvatarProps {
   className?: string
@@ -14,16 +14,17 @@ interface InteractiveAvatarProps {
 
 export function InteractiveAvatar({ className = "", mouseX, mouseY }: InteractiveAvatarProps) {
   const [activeState, setActiveState] = useState<AvatarState>("idle")
-  const [statusMessage, setStatusMessage] = useState("Hover or tap me")
+  const [statusMessage, setStatusMessage] = useState("Tócame o pasa el cursor")
 
-  // Refs for all 4 individual video instances for 0-latency, flicker-free crossfades
-  const idleVideoRef = useRef<HTMLVideoElement | null>(null)
-  const hoverVideoRef = useRef<HTMLVideoElement | null>(null)
-  const click1VideoRef = useRef<HTMLVideoElement | null>(null) // clip3: Thumbs up
-  const click2VideoRef = useRef<HTMLVideoElement | null>(null) // clip5: Vidrio roto surprise
-  const clickCountRef = useRef<number>(0)
+  // Refs for all 4 individual video instances
+  const idleVideoRef = useRef<HTMLVideoElement | null>(null)     // clip1: Respiración / Idle continuo
+  const greetingVideoRef = useRef<HTMLVideoElement | null>(null) // clip2: Saludo
+  const thumbsVideoRef = useRef<HTMLVideoElement | null>(null)   // clip3: Thumbs up / Guiño
+  const glassVideoRef = useRef<HTMLVideoElement | null>(null)    // clip5: Vidrio roto
 
-  // 3D Parallax tilt effect if mouse coordinates are provided
+  const animationStepRef = useRef<number>(0)
+
+  // 3D Parallax tilt effect
   const defaultMouseX = useMotionValue(0)
   const defaultMouseY = useMotionValue(0)
   const currentMouseX = mouseX || defaultMouseX
@@ -34,20 +35,18 @@ export function InteractiveAvatar({ className = "", mouseX, mouseY }: Interactiv
   const springRotateX = useSpring(rotateX, { stiffness: 120, damping: 25 })
   const springRotateY = useSpring(rotateY, { stiffness: 120, damping: 25 })
 
-  // Initialize and ensure idle video plays automatically
+  // Initialize and ensure breathing idle video plays automatically
   useEffect(() => {
     const idleVideo = idleVideoRef.current
     if (idleVideo) {
-      idleVideo.play().catch(() => {
-        // Autoplay fallback: muted is set so this succeeds across modern browsers
-      })
+      idleVideo.play().catch(() => {})
     }
   }, [])
 
-  // Transition back to Idle gracefully
+  // Return to breathing idle loop gracefully
   const returnToIdle = useCallback(() => {
     setActiveState("idle")
-    setStatusMessage("Hover or tap me")
+    setStatusMessage("Tócame o pasa el cursor")
 
     const idleVideo = idleVideoRef.current
     if (idleVideo) {
@@ -55,56 +54,65 @@ export function InteractiveAvatar({ className = "", mouseX, mouseY }: Interactiv
     }
   }, [])
 
-  // Trigger Hover (Greeting) State
-  const handleMouseEnter = useCallback(() => {
-    // Only trigger hover if not currently handling a higher-priority click action
-    if (activeState === "click1" || activeState === "click2") return
+  // Advance animation on Click or Tap (iPad, iPhone, Android, PC)
+  const handleInteraction = useCallback((e?: React.SyntheticEvent) => {
+    if (e) {
+      e.stopPropagation()
+    }
 
-    // Verify fine pointer (desktop mouse)
+    // Cycle through reactions: Saludo -> Thumbs up -> Vidrio roto
+    animationStepRef.current = (animationStepRef.current + 1) % 3
+
+    if (animationStepRef.current === 1) {
+      const v = thumbsVideoRef.current
+      if (v) {
+        v.currentTime = 0
+        v.play().then(() => {
+          setActiveState("thumbs")
+          setStatusMessage("Awesome! 🚀")
+        }).catch(() => {})
+      }
+    } else if (animationStepRef.current === 2) {
+      const v = glassVideoRef.current
+      if (v) {
+        v.currentTime = 0
+        v.play().then(() => {
+          setActiveState("glass")
+          setStatusMessage("Vidrio Roto! 💥")
+        }).catch(() => {})
+      }
+    } else {
+      const v = greetingVideoRef.current
+      if (v) {
+        v.currentTime = 0
+        v.play().then(() => {
+          setActiveState("greeting")
+          setStatusMessage("Hola! 👋")
+        }).catch(() => {})
+      }
+    }
+  }, [])
+
+  // Desktop Hover (only on devices with a mouse/trackpad pointer)
+  const handleMouseEnter = useCallback(() => {
+    if (activeState !== "idle") return
     if (typeof window !== "undefined" && window.matchMedia("(pointer: fine)").matches) {
-      const hoverVideo = hoverVideoRef.current
-      if (hoverVideo) {
-        hoverVideo.currentTime = 0
-        hoverVideo.play().then(() => {
-          setActiveState("hover")
-          setStatusMessage("Greeting! 👋")
+      const v = greetingVideoRef.current
+      if (v) {
+        v.currentTime = 0
+        v.play().then(() => {
+          setActiveState("greeting")
+          setStatusMessage("Hola! 👋")
         }).catch(() => {})
       }
     }
   }, [activeState])
 
   const handleMouseLeave = useCallback(() => {
-    if (activeState === "hover") {
+    if (activeState === "greeting") {
       returnToIdle()
     }
   }, [activeState, returnToIdle])
-
-  // Trigger Click / Tap: Alternates / Randomizes between clip3 (Thumbs up) and clip5 (Vidrio roto)
-  const handleClick = useCallback(() => {
-    clickCountRef.current += 1
-    // Alternates between clip3 and clip5 on subsequent clicks
-    const triggerVidrioRoto = clickCountRef.current % 2 === 0
-
-    if (triggerVidrioRoto) {
-      const click2 = click2VideoRef.current
-      if (click2) {
-        click2.currentTime = 0
-        click2.play().then(() => {
-          setActiveState("click2")
-          setStatusMessage("Vidrio Roto! 💥")
-        }).catch(() => {})
-      }
-    } else {
-      const click1 = click1VideoRef.current
-      if (click1) {
-        click1.currentTime = 0
-        click1.play().then(() => {
-          setActiveState("click1")
-          setStatusMessage("Awesome! 🚀")
-        }).catch(() => {})
-      }
-    }
-  }, [])
 
   return (
     <motion.div
@@ -113,17 +121,17 @@ export function InteractiveAvatar({ className = "", mouseX, mouseY }: Interactiv
         rotateY: springRotateY,
         transformStyle: "preserve-3d",
       }}
-      className={`relative flex flex-col items-center select-none cursor-pointer group ${className}`}
+      className={`relative flex flex-col items-center select-none cursor-pointer group touch-manipulation ${className}`}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
-      onClick={handleClick}
+      onClick={handleInteraction}
       role="button"
       tabIndex={0}
-      aria-label="Interactive 3D Avatar Luis Alfonso Herrera"
+      aria-label="Avatar 3D Interactivo de Luis Alfonso Herrera"
       onKeyDown={(e) => {
         if (e.key === "Enter" || e.key === " ") {
           e.preventDefault()
-          handleClick()
+          handleInteraction()
         }
       }}
     >
@@ -139,7 +147,7 @@ export function InteractiveAvatar({ className = "", mouseX, mouseY }: Interactiv
           maskImage: "radial-gradient(ellipse 90% 92% at 50% 50%, black 72%, transparent 100%)",
         }}
       >
-        {/* 1. STATE: IDLE (Continuous ambient loop) */}
+        {/* 1. ESTADO: IDLE / RESPIRACIÓN (Loop continuo por defecto en segundo plano) */}
         <video
           ref={idleVideoRef}
           src="/avatar/clip1.mp4"
@@ -153,42 +161,42 @@ export function InteractiveAvatar({ className = "", mouseX, mouseY }: Interactiv
           }`}
         />
 
-        {/* 2. STATE: HOVER (Greeting clip on mouseenter) */}
+        {/* 2. ESTADO: SALUDO (clip2) */}
         <video
-          ref={hoverVideoRef}
+          ref={greetingVideoRef}
           src="/avatar/clip2.mp4"
           muted
           playsInline
           preload="auto"
           onEnded={returnToIdle}
           className={`absolute inset-0 w-full h-full object-cover object-top pointer-events-none transition-opacity duration-300 ease-in-out ${
-            activeState === "hover" ? "opacity-100 z-20" : "opacity-0 z-0"
+            activeState === "greeting" ? "opacity-100 z-20" : "opacity-0 z-0"
           }`}
         />
 
-        {/* 3. STATE: CLICK 1 (Energetic reaction / Thumbs up clip) */}
+        {/* 3. ESTADO: THUMBS UP / REACCIÓN (clip3) */}
         <video
-          ref={click1VideoRef}
+          ref={thumbsVideoRef}
           src="/avatar/clip3.mp4"
           muted
           playsInline
           preload="auto"
           onEnded={returnToIdle}
           className={`absolute inset-0 w-full h-full object-cover object-top pointer-events-none transition-opacity duration-300 ease-in-out ${
-            activeState === "click1" ? "opacity-100 z-30" : "opacity-0 z-0"
+            activeState === "thumbs" ? "opacity-100 z-30" : "opacity-0 z-0"
           }`}
         />
 
-        {/* 4. STATE: CLICK 2 (Vidrio roto special reaction clip) */}
+        {/* 4. ESTADO: VIDRIO ROTO (clip5) */}
         <video
-          ref={click2VideoRef}
+          ref={glassVideoRef}
           src="/avatar/clip5.mp4"
           muted
           playsInline
           preload="auto"
           onEnded={returnToIdle}
           className={`absolute inset-0 w-full h-full object-cover object-top pointer-events-none transition-opacity duration-300 ease-in-out ${
-            activeState === "click2" ? "opacity-100 z-30" : "opacity-0 z-0"
+            activeState === "glass" ? "opacity-100 z-40" : "opacity-0 z-0"
           }`}
         />
       </div>
@@ -206,9 +214,9 @@ export function InteractiveAvatar({ className = "", mouseX, mouseY }: Interactiv
         </span>
         <span className="flex items-center gap-1.5">
           {activeState === "idle" && <Sparkles className="w-3.5 h-3.5 text-purple-400" />}
-          {activeState === "hover" && <Hand className="w-3.5 h-3.5 text-cyan-400 animate-bounce" />}
-          {activeState === "click1" && <ThumbsUp className="w-3.5 h-3.5 text-pink-400 animate-pulse" />}
-          {activeState === "click2" && <Zap className="w-3.5 h-3.5 text-yellow-400 animate-bounce" />}
+          {activeState === "greeting" && <Hand className="w-3.5 h-3.5 text-cyan-400 animate-bounce" />}
+          {activeState === "thumbs" && <ThumbsUp className="w-3.5 h-3.5 text-pink-400 animate-pulse" />}
+          {activeState === "glass" && <Zap className="w-3.5 h-3.5 text-yellow-400 animate-bounce" />}
           <span>{statusMessage}</span>
         </span>
       </motion.div>

@@ -2,9 +2,9 @@
 
 import { useEffect, useRef, useState, useCallback } from "react"
 import { motion, useMotionValue, useTransform, useSpring } from "framer-motion"
-import { Sparkles, Hand, ThumbsUp } from "lucide-react"
+import { Sparkles, Hand, ThumbsUp, Zap } from "lucide-react"
 
-type AvatarState = "idle" | "hover" | "click"
+type AvatarState = "idle" | "hover" | "click1" | "click2"
 
 interface InteractiveAvatarProps {
   className?: string
@@ -16,12 +16,14 @@ export function InteractiveAvatar({ className = "", mouseX, mouseY }: Interactiv
   const [activeState, setActiveState] = useState<AvatarState>("idle")
   const [statusMessage, setStatusMessage] = useState("Hover or tap me")
 
-  // Refs for the 3 individual video instances to ensure 0-latency, flicker-free crossfades
+  // Refs for all 4 individual video instances for 0-latency, flicker-free crossfades
   const idleVideoRef = useRef<HTMLVideoElement | null>(null)
   const hoverVideoRef = useRef<HTMLVideoElement | null>(null)
-  const clickVideoRef = useRef<HTMLVideoElement | null>(null)
+  const click1VideoRef = useRef<HTMLVideoElement | null>(null) // clip3: Thumbs up
+  const click2VideoRef = useRef<HTMLVideoElement | null>(null) // clip5: Vidrio roto surprise
+  const clickCountRef = useRef<number>(0)
 
-  // 3D Parallax tilt effect if mouseX and mouseY are provided
+  // 3D Parallax tilt effect if mouse coordinates are provided
   const defaultMouseX = useMotionValue(0)
   const defaultMouseY = useMotionValue(0)
   const currentMouseX = mouseX || defaultMouseX
@@ -56,7 +58,7 @@ export function InteractiveAvatar({ className = "", mouseX, mouseY }: Interactiv
   // Trigger Hover (Greeting) State
   const handleMouseEnter = useCallback(() => {
     // Only trigger hover if not currently handling a higher-priority click action
-    if (activeState === "click") return
+    if (activeState === "click1" || activeState === "click2") return
 
     // Verify fine pointer (desktop mouse)
     if (typeof window !== "undefined" && window.matchMedia("(pointer: fine)").matches) {
@@ -72,32 +74,37 @@ export function InteractiveAvatar({ className = "", mouseX, mouseY }: Interactiv
   }, [activeState])
 
   const handleMouseLeave = useCallback(() => {
-    // If hovering and cursor leaves, return to idle
     if (activeState === "hover") {
       returnToIdle()
     }
   }, [activeState, returnToIdle])
 
-  // Trigger Click / Tap (Enthusiastic Reaction) State
+  // Trigger Click / Tap: Alternates / Randomizes between clip3 (Thumbs up) and clip5 (Vidrio roto)
   const handleClick = useCallback(() => {
-    const clickVideo = clickVideoRef.current
-    if (clickVideo) {
-      clickVideo.currentTime = 0
-      clickVideo.play().then(() => {
-        setActiveState("click")
-        setStatusMessage("Awesome! 🚀")
-      }).catch(() => {})
+    clickCountRef.current += 1
+    // Alternates between clip3 and clip5 on subsequent clicks
+    const triggerVidrioRoto = clickCountRef.current % 2 === 0
+
+    if (triggerVidrioRoto) {
+      const click2 = click2VideoRef.current
+      if (click2) {
+        click2.currentTime = 0
+        click2.play().then(() => {
+          setActiveState("click2")
+          setStatusMessage("Vidrio Roto! 💥")
+        }).catch(() => {})
+      }
+    } else {
+      const click1 = click1VideoRef.current
+      if (click1) {
+        click1.currentTime = 0
+        click1.play().then(() => {
+          setActiveState("click1")
+          setStatusMessage("Awesome! 🚀")
+        }).catch(() => {})
+      }
     }
   }, [])
-
-  // Event handlers for video completion
-  const handleHoverEnded = useCallback(() => {
-    returnToIdle()
-  }, [returnToIdle])
-
-  const handleClickEnded = useCallback(() => {
-    returnToIdle()
-  }, [returnToIdle])
 
   return (
     <motion.div
@@ -153,22 +160,35 @@ export function InteractiveAvatar({ className = "", mouseX, mouseY }: Interactiv
           muted
           playsInline
           preload="auto"
-          onEnded={handleHoverEnded}
+          onEnded={returnToIdle}
           className={`absolute inset-0 w-full h-full object-cover object-top pointer-events-none transition-opacity duration-300 ease-in-out ${
             activeState === "hover" ? "opacity-100 z-20" : "opacity-0 z-0"
           }`}
         />
 
-        {/* 3. STATE: CLICK (Energetic reaction / Thumbs up clip) */}
+        {/* 3. STATE: CLICK 1 (Energetic reaction / Thumbs up clip) */}
         <video
-          ref={clickVideoRef}
+          ref={click1VideoRef}
           src="/avatar/clip3.mp4"
           muted
           playsInline
           preload="auto"
-          onEnded={handleClickEnded}
+          onEnded={returnToIdle}
           className={`absolute inset-0 w-full h-full object-cover object-top pointer-events-none transition-opacity duration-300 ease-in-out ${
-            activeState === "click" ? "opacity-100 z-30" : "opacity-0 z-0"
+            activeState === "click1" ? "opacity-100 z-30" : "opacity-0 z-0"
+          }`}
+        />
+
+        {/* 4. STATE: CLICK 2 (Vidrio roto special reaction clip) */}
+        <video
+          ref={click2VideoRef}
+          src="/avatar/clip5.mp4"
+          muted
+          playsInline
+          preload="auto"
+          onEnded={returnToIdle}
+          className={`absolute inset-0 w-full h-full object-cover object-top pointer-events-none transition-opacity duration-300 ease-in-out ${
+            activeState === "click2" ? "opacity-100 z-30" : "opacity-0 z-0"
           }`}
         />
       </div>
@@ -187,7 +207,8 @@ export function InteractiveAvatar({ className = "", mouseX, mouseY }: Interactiv
         <span className="flex items-center gap-1.5">
           {activeState === "idle" && <Sparkles className="w-3.5 h-3.5 text-purple-400" />}
           {activeState === "hover" && <Hand className="w-3.5 h-3.5 text-cyan-400 animate-bounce" />}
-          {activeState === "click" && <ThumbsUp className="w-3.5 h-3.5 text-pink-400 animate-pulse" />}
+          {activeState === "click1" && <ThumbsUp className="w-3.5 h-3.5 text-pink-400 animate-pulse" />}
+          {activeState === "click2" && <Zap className="w-3.5 h-3.5 text-yellow-400 animate-bounce" />}
           <span>{statusMessage}</span>
         </span>
       </motion.div>

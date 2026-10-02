@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { ExternalLink, Github, Trophy, Cpu, Brain, ChevronDown, ChevronUp, Play } from "lucide-react"
+import { ExternalLink, Github, Trophy, Cpu, Brain, ChevronDown, ChevronUp, Play, Instagram } from "lucide-react"
 import { Tilt3DCard } from "@/components/tilt-3d-card"
 
 interface Project {
@@ -18,7 +18,9 @@ interface Project {
   result: string
   github?: string
   demo?: string
+  demoLabel?: string
   videoUrl?: string
+  poster?: string
   carousel?: { src: string; caption: string }[]
   highlight: boolean
 }
@@ -88,6 +90,24 @@ const projects: Project[] = [
     highlight: true,
     videoUrl: "https://www.youtube.com/embed/rNxhNOWBpas",
     demo: "https://youtube.com/shorts/rNxhNOWBpas?feature=share",
+    demoLabel: "Ver en YouTube",
+  },
+  {
+    id: "alcaldia",
+    badge: "Alcaldía de Barranquilla · Cobertura Oficial",
+    badgeColor: "bg-amber-500/20 text-amber-300 border-amber-500/30",
+    icon: <Instagram className="w-5 h-5 text-amber-400" />,
+    title: "Alcaldía de Barranquilla",
+    subtitle: "Publicación oficial destacando trayectoria STEM y talento joven",
+    problem: "Visibilizar el talento joven y cómo la educación pública abre caminos reales hacia la ingeniería, la robótica y el impacto comunitario.",
+    solution: "La Alcaldía de Barranquilla (Secretaría de Educación) realizó un reportaje oficial en sus plataformas destacando mi camino desde la IDDI Nueva Granada hasta la Universidad del Norte y el liderazgo en competencias de robótica.",
+    tech: ["Alcaldía de Barranquilla", "SED Barranquilla", "IDDI Nueva Granada", "Universidad del Norte", "Robótica", "Educación STEM"],
+    result: "Publicación oficial en Instagram por parte de la Alcaldía de Barranquilla como referente de talento e innovación educativa.",
+    highlight: true,
+    videoUrl: "https://www.instagram.com/reel/DQFMRu4DxUz/embed",
+    poster: "/alcaldia-barranquilla.jpg",
+    demo: "https://www.instagram.com/reel/DQFMRu4DxUz/?stkn=MTR2MmJ5eTB3c2Z4OA==",
+    demoLabel: "Ver en Instagram",
   },
 ]
 
@@ -240,7 +260,8 @@ function ProjectCard({ project }: { project: Project }) {
             {project.demo && (
               <a href={project.demo} target="_blank" rel="noopener noreferrer"
                 className="flex items-center gap-1.5 text-xs text-purple-400/60 hover:text-purple-300 transition-colors px-3 py-1.5 rounded border border-purple-500/20 hover:border-purple-400/40">
-                <ExternalLink className="w-3 h-3" /> Demo
+                {project.id === "alcaldia" ? <Instagram className="w-3 h-3 text-pink-400" /> : <ExternalLink className="w-3 h-3" />}
+                {project.demoLabel || "Demo"}
               </a>
             )}
           </div>

@@ -4,7 +4,7 @@ import { motion } from "framer-motion"
 
 const milestones = [
   { year: "Barranquilla", label: "Origin", detail: "Born and raised in Barranquilla, Colombia. Seeing the needs around my community shaped my understanding of real challenges and the power of opportunity through technology.", icon: "🏙️", color: "border-purple-500/40 bg-purple-500/5" },
-  { year: "IDDI Nueva Granada", label: "School", detail: "Secondary school. First contact with robotics and technology as a real tool for problem-solving.", icon: "🏫", color: "border-blue-500/40 bg-blue-500/5" },
+  { year: "IDDI Nueva Granada", label: "School", detail: "Secondary school. First contact with robotics and technology as a real tool for problem-solving — a journey later highlighted and officially featured by the Alcaldía de Barranquilla.", icon: "🏫", color: "border-blue-500/40 bg-blue-500/5" },
   { year: "2023", label: "First Competition", detail: "Competed in Skill Challenge robotics competition. Bronze medal (3rd place). First taste of national-level competitive robotics — the moment everything clicked.", icon: "🥉", color: "border-orange-500/40 bg-orange-500/5" },
   { year: "2024", label: "Leader & Mentor", detail: "Founded S3 Robotics at Universidad del Norte. 1st place national ROBOTECH. Returned to Skill Challenge as mentor and coach of the winning team.", icon: "🏆", color: "border-yellow-500/40 bg-yellow-500/5" },
   { year: "2024", label: "NASA Space Apps", detail: "Built Project Valentine — a weather monitoring system combining local ESP32 sensors with NASA data. Local Winner, Barranquilla. Later served as judge in the next edition.", icon: "🛸", color: "border-cyan-500/40 bg-cyan-500/5" },

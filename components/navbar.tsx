@@ -37,12 +37,17 @@ export function Navbar() {
         <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
           <motion.a
             href="#"
-            className="font-bold text-lg tracking-tight"
-            whileHover={{ opacity: 0.8 }}
+            className="flex items-center gap-2.5 font-bold text-lg tracking-tight group"
+            whileHover={{ scale: 1.03 }}
           >
-            <span className="bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">luis</span>
-            <span className="text-purple-400">.</span>
-            <span className="bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">dev</span>
+            <div className="relative w-8 h-8 rounded-full overflow-hidden border border-purple-400/40 shadow-sm shadow-purple-500/30 group-hover:border-cyan-400 transition-colors">
+              <img src="/icon.png" alt="Luis Avatar" className="w-full h-full object-cover" />
+            </div>
+            <span>
+              <span className="bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">luis</span>
+              <span className="text-purple-400">.</span>
+              <span className="bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">dev</span>
+            </span>
           </motion.a>
 
           <div className="hidden md:flex items-center gap-8">
